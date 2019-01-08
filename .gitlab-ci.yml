@@ -1,0 +1,32 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - echo "We should build something."
+  only:
+    - master
+  tags:
+    - dev
+
+test:
+  stage: test
+  script:
+    - echo "test..."
+  only:
+    - master
+  tags:
+    - shell
+
+deploy:
+  stage: deploy
+  script:
+     - echo "deployutip..."
+  only:
+     - master
+  tags:
+     - web
+
