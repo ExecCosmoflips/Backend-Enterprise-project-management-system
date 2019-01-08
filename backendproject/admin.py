@@ -4,3 +4,8 @@ from .models import *
 
 admin.site.register(Department)
 admin.site.register(Project)
+admin.site.register(Expend)
+admin.site.register(ConfirmExpend)
+admin.site.register(Receivable)
+admin.site.register(Advance)
+admin.site.register(Income)
