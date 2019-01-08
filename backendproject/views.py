@@ -19,3 +19,4 @@ class ProjectList(generics.ListCreateAPIView):
         department_id = self.request.GET.get('department_id')
         self.queryset = Project.objects.filter(department_id=department_id)
         return self.queryset
+
