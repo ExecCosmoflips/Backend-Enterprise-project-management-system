@@ -4,9 +4,18 @@ from django.utils import timezone
 
 
 # Create your models here.
+
+
 class Department(models.Model):
     name = models.CharField(max_length=20, unique=True)
-    leader = models.ForeignKey(User, on_delete=models.CASCADE)
+    leader = models.OneToOneField(User, on_delete=models.CASCADE)
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True)
+    access = models.IntegerField(default='0')
+    name = models.CharField(max_length=10, null=True)
 
 
 class Project(models.Model):
