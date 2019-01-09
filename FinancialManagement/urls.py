@@ -19,5 +19,6 @@ from django.urls import path
 from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'api/project/list', views.ProjectList.as_view())
+    url(r'api/get_project_list', views.ProjectList.as_view()),
+    url(r'api/login', views.Login.as_view())
 ]
