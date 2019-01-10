@@ -66,3 +66,14 @@ class Login(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return JsonResponse({'result': 0, 'message': '登录失败'})
 
+
+class PersonnelInfo(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        project_id = self.request.GET.get('project_id')
+        self.queryset = Project.objects.filter(id=project_id)[0].personnel
+        return self.queryset
+
+
