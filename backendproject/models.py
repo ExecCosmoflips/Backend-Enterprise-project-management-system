@@ -20,11 +20,12 @@ class UserProfile(models.Model):
 
 class Project(models.Model):
     department = models.ForeignKey(Department, related_name='department', on_delete=models.CASCADE)
-    leader = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+    leader = models.ForeignKey(User, related_name='leader', on_delete=models.CASCADE)
     title = models.CharField(max_length=30, default='')
     content = models.CharField(max_length=500, default='')
     begin_time = models.DateField(null=False, default=timezone.now)
     end_time = models.DateField(null=False, default=timezone.now)
+    personnels = models.ManyToManyField(User, related_name='personnels')
 
 
 class Expend(models.Model):

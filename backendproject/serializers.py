@@ -14,10 +14,42 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Department
         fields = ('id')
 
     def get_full_name(self, obj):
         return obj.leader.last_name + obj.leader.first_name
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    department = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserProfile
+        fields = ('name', 'department', 'access')
+
+    def get_department(self, obj):
+        return obj.department.id
+
+
+class UserSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField()
+
+    def get_profile(self, obj):
+        return UserInfoSerializer(obj.profile).data
+
+    class Meta:
+        model = User
+        fields = ('id', 'profile')
+
+
+class ProjectInfoSerializer(serializers.ModelSerializer):
+    personnel = serializers.SerializerMethodField()
+
+    def get_personnel(self, obj):
+        personnels = obj.personnels.all()
+        return
+
+    class Meta:
+        model = Project
