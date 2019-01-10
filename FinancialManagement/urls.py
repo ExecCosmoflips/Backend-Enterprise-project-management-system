@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'api/get_project_list', views.ProjectList.as_view()),
     url(r'api/login', views.Login.as_view()),
-    path('api/get_project_info', views.ProjectInfo.as_view())
+    path('api/get_project_info', views.ProjectInfo.as_view()),
+    path('api/get_project_personnel_info', views.PersonnelInfo.as_view())
 ]

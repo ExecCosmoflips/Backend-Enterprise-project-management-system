@@ -23,14 +23,14 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    department = serializers.SerializerMethodField()
+    department_name = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
-        fields = ('name', 'department', 'access')
+        fields = ('name', 'department_id', 'access', 'department_name')
 
-    def get_department(self, obj):
-        return obj.department.id
+    def get_department_name(self, obj):
+        return obj.department.name
 
 
 class UserSerializer(serializers.ModelSerializer):
