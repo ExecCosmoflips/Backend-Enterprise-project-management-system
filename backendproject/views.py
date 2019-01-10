@@ -10,6 +10,7 @@ from rest_framework import generics
 from django.contrib import auth
 from rest_framework.response import Response
 from rest_framework import status
+from django.http import Http404
 
 
 # Create your views here.
@@ -23,6 +24,19 @@ class ProjectList(generics.ListCreateAPIView):
         department = Department.objects.filter(id=department_id)[0]
         self.queryset = Project.objects.filter(department_id=department)
         return self.queryset
+
+class ProjectInfo(APIView):
+
+    def get_object(self, pk):
+        try:
+            return Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        project = self.get_object(pk)
+        serializer = ProjectInfoSerializer(project)
+        return Response(serializer.data)
 
 
 class Login(APIView):

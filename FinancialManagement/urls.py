@@ -20,5 +20,6 @@ from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'api/get_project_list', views.ProjectList.as_view()),
-    url(r'api/login', views.Login.as_view())
+    url(r'api/login', views.Login.as_view()),
+    path('api/get_project_info/<int:pk>', views.ProjectInfo.as_view())
 ]
