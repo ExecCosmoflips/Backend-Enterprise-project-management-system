@@ -25,7 +25,8 @@ class Project(models.Model):
     content = models.CharField(max_length=500, default='')
     begin_time = models.DateField(null=False, default=timezone.now)
     end_time = models.DateField(null=False, default=timezone.now)
-    personnels = models.ManyToManyField(User, related_name='personnels')
+    personnel = models.ManyToManyField(User, related_name='personnel')
+
 
 
 class Expend(models.Model):

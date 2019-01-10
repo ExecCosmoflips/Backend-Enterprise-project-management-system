@@ -48,8 +48,7 @@ class ProjectInfoSerializer(serializers.ModelSerializer):
     personnel = serializers.SerializerMethodField()
 
     def get_personnel(self, obj):
-
-        return UserSerializer(obj.personnels.all(), many=True).data
+        return UserSerializer(obj.personnel.all(), many=True).data
 
     class Meta:
         model = Project
