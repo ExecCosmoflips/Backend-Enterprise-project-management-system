@@ -10,6 +10,9 @@ class Department(models.Model):
     name = models.CharField(max_length=20, unique=True)
     leader = models.OneToOneField(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
@@ -27,6 +30,8 @@ class Project(models.Model):
     end_time = models.DateField(null=False, default=timezone.now)
     personnel = models.ManyToManyField(User, related_name='personnel')
 
+    def __str__(self):
+        return self.title
 
 
 class Expend(models.Model):
@@ -36,6 +41,9 @@ class Expend(models.Model):
     title = models.CharField(max_length=30, default='')
     number = models.CharField(max_length=15, blank=False)
     agreement = models.CharField(max_length=500, default='')
+
+    def __str__(self):
+        return self.title
 
 
 class ConfirmExpend(models.Model):
