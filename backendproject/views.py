@@ -24,6 +24,7 @@ class ProjectList(generics.ListCreateAPIView):
         self.queryset = Project.objects.filter(department_id=department)
         return self.queryset
 
+
 class Login(APIView):
     def post(self, request):
         receive = request.data
@@ -33,16 +34,20 @@ class Login(APIView):
 
         user = auth.authenticate(username=username, password=password)
         if user:
+
+            # Token.objects.filter(user=user).delete()
+            # auth.login(request, user)
+            # data = {
+            #     'id': user.id,
+            #     'name': user.profile.name,
+            #     'access': user.profile.access,
+            #     'department': user.profile.department.id,
+            #     'token': 'super_admin',
+            # }
+            serializer = UserSerializer(user)
+            print(user)
             Token.objects.filter(user=user).delete()
-            auth.login(request, user)
-            data = {
-                'id': user.id,
-                'name': user.profile.name,
-                'access': user.profile.access,
-                'department': user.profile.department.id,
-                'token': 'super_admin',
-            }
             token = Token.objects.create(user=user)
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return JsonResponse({'result': 0, 'message': '登录失败'})
 
