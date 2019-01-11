@@ -98,3 +98,12 @@ class DepartmentStaff(generics.ListCreateAPIView):
         department_id = self.request.GET.get('department_id')
         self.queryset = Department.objects.filter(id=department_id)[0].userprofile
         return self.queryset
+
+
+class DepartmentList(APIView):
+
+    def get(self, request):
+        department = []
+        for item in Department.objects.all():
+            department.append({'department_id': item.id, 'department_name': item.name})
+        return JsonResponse(department, safe=False)
