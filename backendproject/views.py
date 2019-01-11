@@ -25,6 +25,7 @@ class ProjectList(generics.ListCreateAPIView):
         self.queryset = Project.objects.filter(department_id=department)
         return self.queryset
 
+
 class ProjectInfo(APIView):
     def get_object(self, pk):
         try:
@@ -48,10 +49,8 @@ class ProjectInfo(APIView):
         project.begin_time = receive['begin_time']
         project.end_time = receive['end_time']
         project.save()
-        return Response(status=status.HTTP_200_OK)
-
-
-
+        serializer = ProjectInfoSerializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class Login(APIView):
