@@ -8,7 +8,7 @@ from django.utils import timezone
 
 class Department(models.Model):
     name = models.CharField(max_length=20, unique=True)
-    leader = models.OneToOneField(User, on_delete=models.CASCADE, related_name='leader')
+    leader = models.OneToOneField(User, on_delete=models.CASCADE, related_name='department')
 
     def __str__(self):
         return self.name
@@ -16,7 +16,7 @@ class Department(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='department_user', null=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='userprofile', null=True)
     access = models.IntegerField(default='0')
     license = models.IntegerField(default='0')
     name = models.CharField(max_length=10, null=True)
@@ -26,20 +26,21 @@ class UserProfile(models.Model):
 
 
 class Project(models.Model):
-    department = models.ForeignKey(Department, related_name='department', on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, related_name='project', on_delete=models.CASCADE)
     leader = models.ForeignKey(User, related_name='leader', on_delete=models.CASCADE)
     title = models.CharField(max_length=30, default='')
     content = models.CharField(max_length=500, default='')
     begin_time = models.DateField(default=timezone.now)
     end_time = models.DateField(default=timezone.now)
-    staff = models.ManyToManyField(User, related_name='staff', null=True)
+    staff = models.ManyToManyField(User, related_name='project', null=True)
 
     def __str__(self):
         return self.title
 
+
 class StaffRequest(models.Model):
     project = models.ForeignKey(Project, related_name='project_request', on_delete=models.CASCADE)
-    staff = models.ForeignKey(User, on_delete=models.CASCADE, related_name='staff')
+    staff = models.ForeignKey(User, on_delete=models.CASCADE)
     whether = models.IntegerField(default='0')
 
 
@@ -56,7 +57,7 @@ class Expend(models.Model):
 
 class ConfirmExpend(models.Model):
     project = models.ForeignKey(Project, related_name='project_confirm', on_delete=models.CASCADE)
-    category = models.ForeignKey(Expend, on_delete=models.CASCADE, related_name='category')
+    category = models.ForeignKey(Expend, on_delete=models.CASCADE, related_name='confrim_category')
     number = models.IntegerField(blank=False)
     agreement = models.ImageField(upload_to='confirm-expend')
 

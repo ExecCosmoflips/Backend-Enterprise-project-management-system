@@ -26,7 +26,6 @@ class ProjectList(generics.ListCreateAPIView):
         return self.queryset
 
 class ProjectInfo(APIView):
-
     def get_object(self, pk):
         try:
             return Project.objects.get(pk=pk)
@@ -38,6 +37,21 @@ class ProjectInfo(APIView):
         project = self.get_object(pk=id)
         serializer = ProjectInfoSerializer(project)
         return Response(serializer.data)
+
+    def post(self, request):
+        receive = request.data
+        leader = User.objects.filter(id=receive['leader'])[0]
+        project = Project.objects.filter(id=receive['id'])[0]
+        project.leader = leader
+        project.title = receive['title']
+        project.content = receive['content']
+        project.begin_time = receive['begin_time']
+        project.end_time = receive['end_time']
+        project.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+
 
 
 class Login(APIView):
@@ -77,3 +91,11 @@ class PersonnelInfo(generics.ListCreateAPIView):
         return self.queryset
 
 
+class DepartmentStaff(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserInfoSerializer
+
+    def get_queryset(self):
+        department_id = self.request.GET.get('department_id')
+        self.queryset = Department.objects.filter(id=department_id)[0].userprofile
+        return self.queryset
