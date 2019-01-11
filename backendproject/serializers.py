@@ -5,6 +5,7 @@ from .models import *
 class ProjectSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     department = serializers.SerializerMethodField()
+
     class Meta:
         model = Project
         fields = ('id','department', 'leader', 'full_name', 'title', 'content', 'content', 'begin_time', 'end_time')
