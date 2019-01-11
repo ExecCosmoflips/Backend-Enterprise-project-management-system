@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/get_project_personnel_info', views.PersonnelInfo.as_view()),
     path('api/get_department_staff', views.DepartmentStaff.as_view()),
     path('api/get_department_list', views.DepartmentList.as_view()),
+    path('api/addreceivable', views.Addreceivable.as_view())
 ]
