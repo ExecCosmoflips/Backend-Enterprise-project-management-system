@@ -11,6 +11,7 @@ from django.contrib import auth
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from datetime import date
 
 
 # Create your views here.
@@ -24,6 +25,11 @@ class ProjectList(generics.ListCreateAPIView):
         department = Department.objects.filter(id=department_id)[0]
         self.queryset = Project.objects.filter(department_id=department)
         return self.queryset
+
+    def post(self, request, *args, **kwargs):
+        receive = request.data
+        print(receive['department_id'])
+        Project.objects.create()
 
 
 class ProjectInfo(APIView):
@@ -46,11 +52,12 @@ class ProjectInfo(APIView):
         project.leader = leader
         project.title = receive['title']
         project.content = receive['content']
-        project.begin_time = receive['begin_time']
-        project.end_time = receive['end_time']
+        project.begin_time = receive['begin_time'][0:10]
+        project.end_time = receive['end_time'][0:10]
+        print(project.leader)
         project.save()
         serializer = ProjectInfoSerializer(project)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
 
 
 class Login(APIView):
@@ -187,3 +194,32 @@ class SetupDepartmentName(APIView):
         Receivable.objects.create(
             name=name)
         return JsonResponse({'info': 'success'})
+
+class GetProjectBarData(APIView):
+
+    def get(self, request):
+        id = request.GET.get('project_id')
+        project = Project.objects.filter(id=id)[0]
+        start_time = project.begin_time
+        end_time = date(year=start_time.year+3,month=start_time.month, day=start_time.day)
+        income = project.project_income.filter(project_id=id, time__range=(start_time, end_time))
+        income_list = []
+        for item in income:
+            income_list.append({
+                'date': item.time,
+                'number': item.confirm_num
+            })
+        expend_list = []
+        expend = project.project_confirm.filter(project_id=id, time__range=(start_time, end_time))
+        for item in expend:
+            expend_list.append({
+                'date': item.time,
+                'number': item.confirm_num
+            })
+        data = {
+            'expendList': expend_list,
+            'incomeList': income_list
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
