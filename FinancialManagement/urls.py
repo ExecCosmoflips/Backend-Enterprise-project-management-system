@@ -25,5 +25,8 @@ urlpatterns = [
     path('api/get_project_personnel_info', views.PersonnelInfo.as_view()),
     path('api/get_department_staff', views.DepartmentStaff.as_view()),
     path('api/get_department_list', views.DepartmentList.as_view()),
-    path('api/addreceivable', views.Addreceivable.as_view())
+    path('api/addreceivable', views.Addreceivable.as_view()),
+    path('api/add_department_admin', views.getAddDepartmentAdmin.as_view()),
+    path('api/add_treasurer', views.getAddTreasurer.as_view()),
+    path('api/setup_dep_name', views.SetupDepartmentName.as_view())
 ]

@@ -108,6 +108,7 @@ class DepartmentList(APIView):
             department.append({'department_id': item.id, 'department_name': item.name})
         return JsonResponse(department, safe=False)
 
+
 class Addreceivable(APIView):
 
     def post(self, request):
@@ -135,9 +136,29 @@ class Addcost(APIView):
         agreement = self.request.POST.get('agreement')
 
         Receivable.objects.create(
-        project=project,
-        category=category,
-        title=title,
-        number=number,
-        agreement=agreement)
+            project=project,
+            category=category,
+            title=title,
+            number=number,
+            agreement=agreement)
         return JsonResponse({'info': 'success'})
+
+
+class getAddDepartmentAdmin(APIView):
+    def post(self,request):
+        department = self.request.POST.get('department')
+        username = self.request.POST.get('username')
+        name = self.request.POST.get('name')
+        email = self.request.POST.get('email')
+        gender = self.request.POST.get('gender')
+        phone = self.request.POST.get('phone')
+
+        Receivable.objects.create(
+            department=department,
+            username=username,
+            name=name,
+            email=email,
+            gender=gender,
+            phone=phone)
+        return JsonResponse({'info': 'success'})
+
