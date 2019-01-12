@@ -71,15 +71,6 @@ class Login(APIView):
         user = auth.authenticate(username=username, password=password)
         if user:
 
-            # Token.objects.filter(user=user).delete()
-            # auth.login(request, user)
-            # data = {
-            #     'id': user.id,
-            #     'name': user.profile.name,
-            #     'access': user.profile.access,
-            #     'department': user.profile.department.id,
-            #     'token': 'super_admin',
-            # }
             serializer = UserSerializer(user)
             print(user)
             Token.objects.filter(user=user).delete()
