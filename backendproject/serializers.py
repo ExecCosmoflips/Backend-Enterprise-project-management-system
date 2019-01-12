@@ -61,3 +61,19 @@ class ProjectInfoSerializer(serializers.ModelSerializer):
 
     def get_leader(self, obj):
         return UserSerializer(obj.leader).data
+
+
+class UserRequestSerializer(serializers.ModelSerializer):
+    staff = serializers.SerializerMethodField()
+    project = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StaffRequest
+        fields = ('id', 'project', 'staff')
+
+    def get_staff(self, obj):
+        return UserInfoSerializer(obj.staff).data
+
+    def get_project(self, obj):
+        return ProjectSerializer(obj.project).data
+
