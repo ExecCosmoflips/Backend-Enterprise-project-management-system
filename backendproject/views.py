@@ -145,7 +145,7 @@ class Addcost(APIView):
 
 
 class getAddDepartmentAdmin(APIView):
-    def post(self,request):
+    def post(self, request):
         department = self.request.POST.get('department')
         username = self.request.POST.get('username')
         name = self.request.POST.get('name')
@@ -162,3 +162,28 @@ class getAddDepartmentAdmin(APIView):
             phone=phone)
         return JsonResponse({'info': 'success'})
 
+
+class getAddTreasurer(APIView):
+    def post(self, request):
+        username = self.request.POST.get('username')
+        name = self.request.POST.get('name')
+        email = self.request.POST.get('email')
+        gender = self.request.POST.get('gender')
+        phone = self.request.POST.get('phone')
+
+        Receivable.objects.create(
+            username=username,
+            name=name,
+            email=email,
+            gender=gender,
+            phone=phone)
+        return JsonResponse({'info': 'success'})
+
+
+class SetupDepartmentName(APIView):
+    def post(self, request):
+        name = self.request.POST.get('name')
+
+        Receivable.objects.create(
+            name=name)
+        return JsonResponse({'info': 'success'})
