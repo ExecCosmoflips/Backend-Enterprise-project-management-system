@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
 from datetime import date
+from django.db.models import Sum
 
 
 # Create your views here.
@@ -202,7 +203,7 @@ class GetProjectBarData(APIView):
         project = Project.objects.filter(id=id)[0]
         start_time = project.begin_time
         end_time = date(year=start_time.year+3,month=start_time.month, day=start_time.day)
-        income = project.project_income.filter(project_id=id, time__range=(start_time, end_time))
+        income = project.project_income.filter(time__range=(start_time, end_time))
         income_list = []
         for item in income:
             income_list.append({
@@ -210,7 +211,7 @@ class GetProjectBarData(APIView):
                 'number': item.confirm_num
             })
         expend_list = []
-        expend = project.project_confirm.filter(project_id=id, time__range=(start_time, end_time))
+        expend = project.project_confirm.filter(time__range=(start_time, end_time))
         for item in expend:
             expend_list.append({
                 'date': item.time,
@@ -220,6 +221,18 @@ class GetProjectBarData(APIView):
             'expendList': expend_list,
             'incomeList': income_list
         }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class GetProjectPieData(APIView):
+
+    def get(self, request):
+        id = request.GET.get('project_id')
+        begin_time = request.GET.get('begin_time')
+        end_time = request.GET.get('end_time')
+        project = Project.objects.filter(id=id)[0]
+        data = project.project_income.filter(
+            time__range=(begin_time, end_time)).values('category').annotate(value=Sum('confirm_num'))
         return Response(data, status=status.HTTP_200_OK)
 
 
