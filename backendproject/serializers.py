@@ -8,7 +8,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id','department', 'leader', 'full_name', 'title', 'content', 'content', 'begin_time', 'end_time')
+        fields = ('id', 'department', 'leader', 'full_name', 'title', 'content', 'content', 'begin_time', 'end_time')
 
     def get_full_name(self, obj):
         return obj.leader.profile.name

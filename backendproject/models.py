@@ -50,12 +50,20 @@ class StaffRequest(models.Model):
     whether = models.IntegerField(default='0')
 
 
+class FinancialModel(models.Model):
+    name = models.CharField(max_length=30, default='')
+    number = models.IntegerField(default='0')
+    status = models.IntegerField(default='0')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_financial')
+
+
 class Expend(models.Model):
     project = models.ForeignKey(Project, related_name='project_expend', on_delete=models.CASCADE)
-    category = models.CharField(max_length=30, default='')
+    category = models.ForeignKey(FinancialModel, related_name='category', on_delete=models.PROTECT)
     title = models.CharField(max_length=30, default='')
     number = models.IntegerField(blank=False)
-    agreement = models.ImageField(upload_to='confirm-expend', default='')
+    agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    time = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.title
@@ -66,14 +74,16 @@ class ConfirmExpend(models.Model):
     category = models.CharField(max_length=30, default='')
     number = models.IntegerField(blank=False)
     agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    time = models.DateField(default=timezone.now)
 
 
 class Receivable(models.Model):
     project = models.ForeignKey(Project, related_name='project_receivable', on_delete=models.CASCADE)
-    category = models.CharField(max_length=30, default='')
+    category = models.ForeignKey(FinancialModel,on_delete=models.PROTECT)
     title = models.CharField(max_length=30, default='')
     number = models.IntegerField(blank=False)
     agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    time = models.DateField(default=timezone.now)
 
 
 class Advance(models.Model):
@@ -81,6 +91,7 @@ class Advance(models.Model):
     category = models.CharField(max_length=30, default='')
     number = models.IntegerField(default='0')
     agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    time = models.DateField(default=timezone.now)
 
 
 class Income(models.Model):
@@ -89,10 +100,6 @@ class Income(models.Model):
     confirm_num = models.FloatField(default = '0')
     tax_rate = models.FloatField(blank = False)
     agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    time = models.DateField(default=timezone.now)
 
 
-class FinancialModel(models.Model):
-    name = models.CharField(max_length=30, default='')
-    number = models.IntegerField(default='0')
-    status = models.IntegerField(default='0')
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_financial')
