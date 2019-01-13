@@ -136,9 +136,10 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 
+MEDIA_URL = '/api/media/'
 # Add for Vue.js
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, ".../frontend/dist/static"),
+    os.path.join(BASE_DIR, ".../frontend/dist/static")
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
