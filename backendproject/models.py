@@ -103,3 +103,9 @@ class Income(models.Model):
     time = models.DateField(default=timezone.now)
 
 
+class Company(models.Model):
+    name = models.CharField(max_length=50, default='计蒜客')
+    logo = models.ImageField(upload_to='logo')
+    time = models.DateField(default=timezone.now)
+
+
