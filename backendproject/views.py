@@ -99,6 +99,7 @@ class PersonnelInfo(generics.ListCreateAPIView):
 
 
 class DepartmentStaff(generics.ListCreateAPIView):
+    #列出部门人员列表
     queryset = User.objects.all()
     serializer_class = UserInfoSerializer
 
@@ -109,6 +110,7 @@ class DepartmentStaff(generics.ListCreateAPIView):
 
 
 class DepartmentList(APIView):
+    # 所有表项的部门外键List(可用于下拉框）
 
     def get(self, request):
         department = []
@@ -117,7 +119,26 @@ class DepartmentList(APIView):
         return JsonResponse(department, safe=False)
 
 
-class getAddDepartmentAdmin(APIView):
+class ProjectListAll(APIView):
+    #所有表项的项目下拉
+    def get(self,request):
+        project=[]
+        for item in Project.objects.all():
+           project.append({'project_id':item.id,'project_title':item.title})
+        return JsonResponse(project,safe=False)
+
+class ProjectList(APIView):
+    #登录对应状态下的项目表LIST（下拉框）
+   def get(self,request):
+       project = []
+       department_id=self.request.GET.get('department_id')[0]
+       for item in Project.objects.filter(department_id=department_id):
+            project.append({'project_id':item.id,'title':item.title})
+       return JsonResponse(project,safe=False)
+
+
+class GetAddDepartmentAdmin(APIView):
+
     def post(self, request):
         department = self.request.POST.get('department')
         username = self.request.POST.get('username')
@@ -136,7 +157,7 @@ class getAddDepartmentAdmin(APIView):
         return JsonResponse({'info': 'success'})
 
 
-class getAddTreasurer(APIView):
+class GetAddTreasurer(APIView):
     def post(self, request):
         username = self.request.POST.get('username')
         name = self.request.POST.get('name')
@@ -202,7 +223,8 @@ class GetProjectPieData(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 
-class Addreceivable(APIView):
+class AddReceivable(APIView):
+
 
     # 应收表的插入
 
@@ -232,8 +254,9 @@ class ReceivableListForAdvance(APIView):
         return JsonResponse(receivable, safe=False)
 
 
-class Addexpend(APIView):
-    # 费用表的插入
+
+class AddExpend(APIView):
+    #费用表的插入
 
     def post(self, request):
         project = self.request.POST.get('project')
@@ -251,7 +274,8 @@ class Addexpend(APIView):
         return JsonResponse({'info': 'success'})
 
 
-class Addadvance(APIView):
+class AddAdvance(APIView):
+
     # 预收表的插入
     def post(self, request):
         project = self.request.POST.get('project')
@@ -266,8 +290,8 @@ class Addadvance(APIView):
             agreement=agreement)
         return JsonResponse({'info': 'success'})
 
+class AddIncome(APIView):
 
-class Addincome(APIView):
     # 收入表的插入（确认收入功能）
     def post(self, request):
         project = self.request.POST.get('project')
@@ -282,6 +306,22 @@ class Addincome(APIView):
             tax_rate=tax_rate,
             agreement=agreement)
         return JsonResponse({'info': 'success'})
+
+
+class AddConfirmExpend(APIView):
+        # 确认费用表的插入
+       def post(self,request):
+           project=self.request.POST.get('project')
+           category=self.request.POST.get('category')
+           number=self.request.POST.get('number')
+           agreement=self.request.POST.get('agreement')
+           ConfirmExpend.objects.create(
+               project=project,
+               category=category,
+               number=number,
+               agreement=agreement
+           )
+           return JsonResponse({'info': 'success'})
 
 
 class AddconfirmExpend(APIView):
@@ -300,87 +340,131 @@ class AddconfirmExpend(APIView):
         return JsonResponse({'info': 'success'})
 
 
-class AddloaclDepartmentUser(APIView):
-    # 添加本部门的成员信息
-    def post(self, request):
-        name = self.request.POST.get('name')
-        email = self.request.POST.get('email')
-        phone = self.request.POST.get('phone')
-        license_name = self.request.POST.get('license')
-        if (license_name == '是'):
-            license = 1
 
-        UserProfile.objects.create(
-            name=name,
-            email=email,
-            phone=phone,
-            license=license
-        )
-        return JsonResponse({'info': 'success'})
+class AddLoaclDepartmentUser(APIView):
+    #添加本部门的成员信息
+     def post(self,request):
+         department = self.request.POST.get('department_id')
+         name=self.request.POST.get('name')
+         email=self.request.POST.get('email')
+         phone=self.request.POST.get('phone')
+         license_name=self.request.POST.get('license')
+         if(license_name=='是'):
+             license=1
 
-
-class AdduserRequest(APIView):
-    # 发起添加项目人员请求
-    def post(self, request):
-        project = self.request.POST.get('project')
-        staff = self.request.POST.get('staff')
-        StaffRequest.objects.create(
-            project=project,
-            staff=staff,
-
-        )
-        return JsonResponse({'info': 'success'})
+         UserProfile.objects.create(
+             department=department,
+             name=name,
+             email=email,
+             phone=phone,
+             license=license
+         )
+         return JsonResponse({'info': 'success'})
+class ListUser(APIView):
+    #列出全部人员（用于项目管理员添加项目人员）
+     def get(self,request):
+         list=[]
+         for item in UserProfile.objects.filter(license=1):
+            list.append({'user_id':item.id,'name':item.name,'email':item.email})
+         return JsonResponse(list,safe=False)
 
 
-class PastuserRequest(APIView):
-    # 批准本部门人员请求
-    def post(self, request):
-        whether_name = self.request.POST.get('whether')
-        id = self.request.POST.get('id')
-        if (whether_name == '批准'):
-            whether = 1
-        elif (whether_name == '不批准'):
-            whether = 2
-        StaffRequest.objects.create(
-            whether=whether
-        )
+class ListProjectInDepartment(APIView):
+    #列出本部门下的项目
+       def get(self,request):
+           department_id=self.request.GET.get('department_id')
+           department=Department.objects.filter(department_id=department_id)
+           list=[]
+           for item in Project.objects.filter(department=department):
+                list.append({'project_id':item.id,'project_title':item.title})
+           return JsonResponse(list,safe=False)
 
 
-class ListuserRequest(generics.ListCreateAPIView):
-    # 列出部门人员请求的列表
+
+
+class AddUserRequest(APIView):
+    #发起添加项目人员请求
+       def post(self,request):
+            data =self.request.POST.get('data')
+            for item in data:
+             id=item.id
+             department_id2=UserProfile.department.filter(user_id=id).id
+             department_id = self.request.POST.get('department_id')
+             if (department_id != department_id2):
+               staff=data.name
+               id=data.project_id
+               project=Project.objects.filter(project_id=id)
+               StaffRequest.objects.create(
+                   staff=staff,
+                   project=project,
+
+               )
+             else:
+               id=data.project_id
+               staff=data.name
+               Project.objects.filter(id=id).add(staff=staff )
+            return JsonResponse({'info': 'success'})
+
+class PastUserRequest(APIView):
+    #批准部门人员请求
+      def post(self,request):
+          whether_name=self.request.POST.get('whether')
+          project=self.request.POST.get('project')
+          project_title=project.title
+          staff=self.request.POST.get('staff')
+          if(whether_name=='批准'):
+              whether=1
+              Project.objects.filter(title=project_title).add(staff=staff)
+          elif(whether_name=='不批准'):
+              whether=2
+          StaffRequest.objects.update(
+              whether=whether
+          )
+
+          return JsonResponse({'info':'success'})
+
+
+class ListUserRequest(generics.ListCreateAPIView):
+    #列出部门人员请求的列表
+
     queryset = StaffRequest.objects.all()
     serializer_class = ProjectSerializer
 
     def get_queryset(self):
         department_id = self.request.GET.get('department_id')
-        department = Department.objects.filter(id=department_id)[0]
-        self.queryset = StaffRequest.objects.filter(department_id=department)
+        department = Department.objects.filter(id=department_id)
+        project=Project.objects.filter(department=department)
+        self.queryset = StaffRequest.objects.filter(project=project)
         return self.queryset
 
 
-class AddfinancialModel(APIView):
-    # 给项目添加编辑财务模型
-    def post(self, request):
-        name = self.request.POST.get('name')
-        number = self.request.POST.get('number')
-        status_name = self.request.POST.get('status')
-        if (status_name == '费用类别'):
-            status = 0
-        elif (status_name == '收入类别'):
-            status = 1
-        FinancialModel.objects.create(
-            name=name,
-            number=number,
-            status=status
-        )
-        return JsonResponse({'info': 'success'})
+class AddFinancialModel(APIView):
+    #给项目添加编辑财务模型
+    def post(self,request):
+       project=self.request.POST.get('project')
+       name=self.request.POST.get('name')
+       number=self.request.POST.get('number')
+       status_name=self.request.POST.get('status')
+       if(status_name=='费用类别'):
+           status=0
+       elif(status_name=='收入类别'):
+           status=1
+       FinancialModel.objects.create(
+           name=name,
+           number=number,
+           status=status,
+           project=project
+       )
+       return JsonResponse({'info':'success'})
 
 
-class CheckreceivableList(APIView):
-    # 查看应收表
+class CheckReceivableList(APIView):
+    #查看应收表
+
     def get(self, request):
-        project_id = self.request.GET.get('project_id')
-        project = Project.objects.filter(id=project_id)[0]
+        department_id = self.request.GET.get('department_id')
+        department = Department.objects.filter(department_id=department_id)
+        project = Project.objects.filter(department=department)
         receivable = []
         for item in Receivable.objects.filter(project=project):
             receivable.append(
@@ -397,11 +481,13 @@ class CheckreceivableList(APIView):
         return JsonResponse(list, safe=False)
 
 
-class Checkexpend(APIView):
-    # 查看费用表
+class CheckExpend(APIView):
+    #查看费用表
+
     def get(self, request):
-        project_id = self.request.GET.get('project_id')
-        project = Project.objects.filter(id=project_id)[0]
+        department_id=self.request.GET.get('department_id')
+        department=Department.objects.filter(department_id=department_id)
+        project = Project.objects.filter(department=department)
         receivable = []
         for item in Expend.objects.filter(project=project):
             receivable.append(
@@ -417,11 +503,13 @@ class Checkexpend(APIView):
         return JsonResponse(list, safe=False)
 
 
-class CheckconfirmExpend(APIView):
-    # 查看确认费用表
+class CheckConfirmExpend(APIView):
+    #查看确认费用表
+
     def get(self, request):
-        project_id = self.request.GET.get('project_id')
-        project = Project.objects.filter(id=project_id)[0]
+        department_id = self.request.GET.get('department_id')
+        department = Department.objects.filter(department_id=department_id)
+        project = Project.objects.filter(department=department)
         receivable = []
         for item in ConfirmExpend.objects.filter(project=project):
             receivable.append(
@@ -437,34 +525,37 @@ class CheckconfirmExpend(APIView):
                 {'confirmexpend_id': item.id, 'title': item.title, 'number': item.number, 'agreement': item.agreement})
         return JsonResponse(list, safe=False)
 
-
-class Checkincome(APIView):
-    # 查看确认收入表
-    def get(self, request):
-        project_id = self.request.GET.get('project_id')
-        project = Project.objects.filter(id=project_id)[0]
-        receivable = []
-        for item in Income.objects.filter(project=project):
+class CheckIncome(APIView):
+    #查看确认收入表
+      def get(self, request):
+          department_id = self.request.GET.get('department_id')
+          department = Department.objects.filter(department_id=department_id)
+          project = Project.objects.filter(department=department)
+          receivable = []
+          for item in Income.objects.filter(project=project):
             receivable.append({'income_id': item.id, 'confirm_num': item.confirm_num, 'tax_rate': item.tax_rate,
-                               'agreement': item.agreement})
-        return JsonResponse(receivable, safe=False)
+                 'agreement': item.agreement})
+          return JsonResponse(receivable, safe=False)
 
-    def post(self, request):
+
+      def post(self, request):
         list = []
         project = self.request.POST.get('project')
         category = self.request.POST.get('category')
         for item in Income.objects.filter(project=project, category=category):
             list.append({'income_id': item.id, 'confirm_num': item.confirm_num, 'tax_rate': item.tax_rate,
                          'agreement': item.agreement})
-
         return JsonResponse(list, safe=False)
 
 
-class Checkadvance(APIView):
-    # 查看确认预收表
+
+class CheckAdvance(APIView):
+    #查看确认预收表
+
     def get(self, request):
-        project_id = self.request.GET.get('project_id')
-        project = Project.objects.filter(id=project_id)[0]
+        department_id = self.request.GET.get('department_id')
+        department = Department.objects.filter(department_id=department_id)
+        project = Project.objects.filter(department=department)
         receivable = []
         for item in Advance.objects.filter(project=project):
             receivable.append({'advance_id': item.id, 'number': item.number, 'agreement': item.agreement})
