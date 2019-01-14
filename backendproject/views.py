@@ -221,9 +221,8 @@ class AddReceivable(APIView):
     # 应收表的插入
 
     def post(self, request):
-
         project_id = self.request.POST.get('project_id')
-        project=Project.objects.filter(project_id=project_id)[0]
+        project = Project.objects.filter(project_id=project_id)[0]
         category = self.request.POST.get('category')
         title = self.request.POST.get('title')
         number = self.request.POST.get('number')
@@ -267,60 +266,115 @@ class AddExpend(APIView):
             agreement=agreement)
         return JsonResponse({'info': 'success'})
 
+class DepartmentListForAdvance(APIView):
 
-class AddAdvance(APIView):
+    def get(self, request):
+        department = []
+        for item in Department.objects.all():
+            department.append({'department_id': item.id, 'department_name': item.name})
+        return JsonResponse(department, safe=False)
 
-    # 预收表的插入
+
+class ReceivableListForAdvance(APIView):
+
+    def get(self, request):
+        project_id = self.request.GET.get('project_id')
+        project = Project.objects.filter(id=project_id)[0]
+        receivable = []
+        for item in Receivable.objects.filter(project=project):
+            receivable.append({'receivable_id': item.id, 'receivable_title': item.title,
+                               'receivable_category': item.category})
+        return JsonResponse(receivable, safe=False)
+
+
+class ConfirmExpendListForExpend(APIView):
+
+    def get(self, request):
+        project_id = self.request.GET.get('project_id')
+        project = Project.objects.filter(id=project_id)[0]
+        confirm_expend = []
+        for item in ConfirmExpend.objects.filter(project=project):
+            confirm_expend.append({'confirm_expend_id': item.id, 'confirm_expend_category': item.category.category})
+        return JsonResponse(confirm_expend, safe=False)
+
+
+class RecordAdvance(APIView):
+
     def post(self, request):
         project_id = self.request.POST.get('project_id')
-        project = Project.objects.filter(project_id=project_id)[0]
-        category = self.request.POST.get('category')
-        number = self.request.POST.get('number')
-        agreement = self.request.POST.get('agreement')
-        Advance.objects.create(
-
-            project=project,
-            category=category,
-            number=number,
-            agreement=agreement)
+        project = Project.objects.filter(id=project_id)[0]
+        receivable_id = self.request.POST.get('receivable_id')
+        receivable = Receivable.objects.filter(id=receivable_id)[0]
+        advance_number = self.request.POST.get('advance_number')
+        advance_number = int(advance_number)
+        # advance_agreement = self.request.FILES.get('advance_agreement')
+        Advance.objects.create(project=project, receivable=receivable,
+                               number=advance_number)
         return JsonResponse({'info': 'success'})
 
 
-class AddIncome(APIView):
+class AdvanceImage(APIView):
 
-    # 收入表的插入（确认收入功能）
     def post(self, request):
-        project_id = self.request.POST.get('project_id')
-        project = Project.objects.filter(project_id=project_id)[0]
-        category = self.request.POST.get('category')  # 前端借用应收表的下拉框ReceivableListForAdvance方法
-        confirm_num = self.request.POST.get('confirm_num')
-        tax_rate = self.request.POST.get('tax_rate')
-        agreement = self.request.POST.get('agreement')
-        Income.objects.create(
-            project=project,
-            receivable=category,
-            confirm_num=confirm_num,
-            tax_rate=tax_rate,
-            agreement=agreement)
-        return JsonResponse({'info': 'success'})
+        name = self.request.POST.get('name')
+        print(name)
 
 
-class AddConfirmExpend(APIView):
+class ListAdvanceInfo(APIView):
 
-    # 确认费用表的插入
-    def post(self, request):
-        project_id = self.request.POST.get('project_id')
-        project = Project.objects.filter(project_id=project_id)[0]
-        category = self.request.POST.get('category')
-        number = self.request.POST.get('number')
-        agreement = self.request.POST.get('agreement')
-        ConfirmExpend.objects.create(
-            project=project,
-            category=category,
-            number=number,
-            agreement=agreement
-        )
-        return JsonResponse({'info': 'success'})
+    def get(self, request):
+        advance = []
+        for item in Advance.objects.all():
+            advance.append({
+                            'department_id': item.receivable.project.department.id,
+                            'department_name': item.receivable.project.department.name,
+                            'project_id': item.receivable.project.id,
+                            'project_title': item.receivable.project.title,
+                            'receivable_id': item.receivable.id,
+                            'receivable_title': item.receivable.title,
+                            'receivable_num': item.receivable.number,
+                            'advance_num': item.number})
+        return JsonResponse(advance, safe=False)
+
+
+class ListConfirmExpendInfo(APIView):
+
+    def get(self, request):
+        confirm_expend = []
+        for item in ConfirmExpend.objects.all():
+            confirm_expend.append({
+                'department_id': item.project.department.id,
+                'department_name': item.project.department.name,
+                'project_id': item.project.id,
+                'project_title': item.project.title,
+                'confirm_expend_id': item.id,
+                'confirm_expend_title': item.category.title,
+                'confirm_expend_num': item.number
+            })
+        return JsonResponse(confirm_expend, safe=False)
+
+
+class ListIncomeInfo(APIView):
+
+    def get(self, request):
+        income = []
+        for item in Income.objects.all():
+            income.append({
+                'department_id': item.project.department.id,
+                'department_name': item.project.department.name,
+                'project_id': item.project.id,
+                'project_title': item.project.title,
+                'receivable_id': item.receivable.id,
+                'receivable_title': item.receivable.title,
+                'receivable_category': item.receivable.category,
+                'confirm_num': item.confirm_num,
+                'tax_rate': item.tax_rate
+            })
+        return JsonResponse(income, safe=False)
+
+
+
+
 
 
 class ListUser(APIView):
@@ -328,7 +382,8 @@ class ListUser(APIView):
     def get(self, request):
         list = []
         for item in UserProfile.objects.filter(license=1):
-            list.append({'user_id': item.id, 'name': item.name, 'email': item.email,'department_id2': item.department.id})
+            list.append(
+                {'user_id': item.id, 'name': item.name, 'email': item.email, 'department_id2': item.department.id})
         return JsonResponse(list, safe=False)
 
 
@@ -346,7 +401,6 @@ class ListProjectInDepartment(APIView):
 class AddLocalDepartmentUser(APIView):
     # 添加本部门的成员信息
     def post(self, request):
-
         department_id = self.request.POST.get('department_id')
         department = Department.objects.filter(department_id=department_id)[0]
         name = self.request.POST.get('name')
@@ -354,12 +408,12 @@ class AddLocalDepartmentUser(APIView):
         phone = self.request.POST.get('phone')
         license = self.request.POST.get('license')
         UserProfile.objects.create(
-                name=name,
-                email=email,
-                phone=phone,
-                license=license,
-                department=department
-                 )
+            name=name,
+            email=email,
+            phone=phone,
+            license=license,
+            department=department
+        )
         return JsonResponse({'info': 'success'})
 
 
@@ -373,7 +427,7 @@ class AddUserRequest(APIView):
             department_id = self.request.POST.get('department_id')
             if department_id != department_id2:
                 staff = data.name
-                id = data.project_id#前端选择一个project传进来
+                id = data.project_id  # 前端选择一个project传进来
                 project = Project.objects.filter(project_id=id)[0]
                 StaffRequest.objects.create(
                     staff=staff,
@@ -391,7 +445,7 @@ class PastUserRequest(APIView):
     # 批准部门人员请求
     def post(self, request):
         whether_name = self.request.POST.get('whether')
-        project_id=self.request.POST.get('project_id')
+        project_id = self.request.POST.get('project_id')
         project = Project.objects.filter(id=project_id)
         project_title = project.title
         staff = self.request.POST.get('staff')
@@ -404,8 +458,6 @@ class PastUserRequest(APIView):
             whether=whether
         )
         return JsonResponse({'info': 'success'})
-
-
 
 
 class ListUserRequest(generics.ListCreateAPIView):
@@ -449,15 +501,25 @@ class CheckReceivableList(APIView):
     # 查看应收表
 
     def get(self, request):
-        project_id = self.request.GET.get('project_id')
-        project=Project.objects.filter(project_id=project_id)
+        # department_id=self.request.GET.get('department_id')
+        # department=Department.objects.filter(department_id=department_id)
+        license = self.request.GET.get('license')
+        project_id = license
+        project = Project.objects.filter(project_id=project_id)
         receivable = []
         for item in Receivable.objects.filter(project=project):
             receivable.append(
-                {'receivable_id': item.id, 'title': item.title, 'number': item.number, 'agreement': item.agreement})
+                {'receivable_id': item.id,
+                 'title': item.title,
+                 'number': item.number,
+                 'agreement': item.agreement,
+                 'project_id': item.project.id,
+                 'project_name': item.project.title,
+                 'category_id': item.category.id,
+                 'category_name': item.category.name,
+                 'department_name':item.project.department.name
+                 })
         return JsonResponse(receivable, safe=False)
-
-
 
 
 class CheckExpend(APIView):
@@ -465,13 +527,25 @@ class CheckExpend(APIView):
     # 查看费用表
 
     def get(self, request):
-        project_id = self.request.GET.get('project_id')
+        # department_id=self.request.GET.get('department_id')
+        # department=Department.objects.filter(department_id=department_id)
+        license = self.request.GET.get('license')
+        project_id = license
         project = Project.objects.filter(project_id=project_id)
         receivable = []
         for item in Expend.objects.filter(project=project):
             receivable.append(
-                {'expend_id': item.id, 'title': item.title, 'number': item.number, 'agreement': item.agreement})
-
+                {'expend_id': item.id,
+                 'title': item.title,
+                 'number': item.number,
+                 'agreement': item.agreement,
+                 'project_id': item.project.id,
+                 'project_name': item.project.title,
+                 'category_id': item.category.id,
+                 'category_name': item.category.name,
+                 'department_name': item.project.department.name
+                 })
+        return JsonResponse(receivable, safe=False)
 
 
 class SetLogo(APIView):
@@ -503,7 +577,7 @@ class SendEmail(APIView):
         user = User.objects.create_user(username=email)
         UserProfile.objects.create(user=user, email=email, department_id=department_id)
         url_id = '?department_id=' + department_id + '&user=' + str(user.id)
-        msg = '<a href=\"' + BASE_URL + url_id +'\">点击激活</a>'
+        msg = '<a href=\"' + BASE_URL + url_id + '\">点击激活</a>'
         print(msg)
         #  send_mail('标题', '内容', settings.EMAIL_FROM, ['1452372625@qq.com'], html_message=msg)
         return Response(status=status.HTTP_200_OK)
