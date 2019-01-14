@@ -13,6 +13,8 @@ from rest_framework import status
 from django.http import Http404
 from datetime import date
 from django.db.models import Sum
+from django.conf import settings
+from django.core.mail import send_mail
 
 
 # Create your views here.
@@ -351,7 +353,6 @@ class AddLocalDepartmentUser(APIView):
         email = self.request.POST.get('email')
         phone = self.request.POST.get('phone')
         license = self.request.POST.get('license')
-
         UserProfile.objects.create(
                 name=name,
                 email=email,
@@ -402,7 +403,6 @@ class PastUserRequest(APIView):
         StaffRequest.objects.update(
             whether=whether
         )
-
         return JsonResponse({'info': 'success'})
 
 
@@ -471,8 +471,6 @@ class CheckExpend(APIView):
         for item in Expend.objects.filter(project=project):
             receivable.append(
                 {'expend_id': item.id, 'title': item.title, 'number': item.number, 'agreement': item.agreement})
-        return JsonResponse(receivable, safe=False)
-
 
 
 
@@ -495,3 +493,35 @@ class ErrorLogger(APIView):
 
     def get(self, request):
         return Response(status=status.HTTP_200_OK)
+
+
+class SendEmail(APIView):
+    def get(self, request):
+        BASE_URL = 'http://localhost:8080/register'
+        email = request.GET.get('email')
+        department_id = request.GET.get('department_id')
+        user = User.objects.create_user(username=email)
+        UserProfile.objects.create(user=user, email=email, department_id=department_id)
+        url_id = '?department_id=' + department_id + '&user=' + str(user.id)
+        msg = '<a href=\"' + BASE_URL + url_id +'\">点击激活</a>'
+        print(msg)
+        #  send_mail('标题', '内容', settings.EMAIL_FROM, ['1452372625@qq.com'], html_message=msg)
+        return Response(status=status.HTTP_200_OK)
+
+
+class Register(APIView):
+    def post(self, request):
+        receive = request.data
+        print(receive)
+        user_id = receive['user']
+        username = receive['username']
+        password = receive['password']
+        name = receive['name']
+        user = User.objects.filter(id=user_id)[0]
+        user.username = username
+        user.password = make_password(password)
+        user.save()
+        user_profile = user.profile
+        user_profile.name = name
+        user_profile.save()
+        return Response(data=user.password, status=status.HTTP_200_OK)

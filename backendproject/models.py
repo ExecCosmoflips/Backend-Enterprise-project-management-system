@@ -105,3 +105,5 @@ class Company(models.Model):
     time = models.DateField(default=timezone.now)
 
 
+
+

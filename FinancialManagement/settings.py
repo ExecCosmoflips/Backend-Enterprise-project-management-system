@@ -59,7 +59,7 @@ ROOT_URLCONF = 'FinancialManagement.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['.../FrontendProject/dist'],
+        'DIRS': ['F:\my_workspace\FrontendProject\dist'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -138,9 +138,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 
 MEDIA_URL = '/api/media/'
 # Add for Vue.js
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, ".../frontend/dist/static")
-]
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -155,3 +152,20 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
 )
+
+
+# 配置邮箱发邮件的相关功能
+
+#这一项是固定的
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_SSL = True
+# smtp服务的邮箱服务器
+EMAIL_HOST = 'smtp.qq.com'
+# smtp服务的端口
+EMAIL_PORT = 465
+#发送邮件的邮箱
+EMAIL_HOST_USER = '1452372625@qq.com'
+#在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'ucaqyzcpjuibjaff'
+#收件人看到的发件人 <此处要和发送邮件的邮箱相同>
+EMAIL_FROM = 'python<1452372625@qq.com>'
