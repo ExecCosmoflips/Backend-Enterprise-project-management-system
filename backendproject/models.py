@@ -39,7 +39,6 @@ class Project(models.Model):
         return self.title
 
 
-
 class StaffRequest(models.Model):
     project = models.ForeignKey(Project, related_name='project_request', on_delete=models.CASCADE)
     staff = models.ForeignKey(User, on_delete=models.CASCADE, related_name='staff_request')

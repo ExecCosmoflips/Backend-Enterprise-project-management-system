@@ -15,6 +15,7 @@ from datetime import date
 from django.db.models import Sum
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import Q
 
 
 # Create your views here.
@@ -573,13 +574,16 @@ class SendEmail(APIView):
     def get(self, request):
         BASE_URL = 'http://localhost:8080/register'
         email = request.GET.get('email')
+        print(email)
         department_id = request.GET.get('department_id')
-        user = User.objects.create_user(username=email)
-        UserProfile.objects.create(user=user, email=email, department_id=department_id)
-        url_id = '?department_id=' + department_id + '&user=' + str(user.id)
-        msg = '<a href=\"' + BASE_URL + url_id + '\">点击激活</a>'
-        print(msg)
-        #  send_mail('标题', '内容', settings.EMAIL_FROM, ['1452372625@qq.com'], html_message=msg)
+        print(department_id)
+        if email and department_id:
+            user = User.objects.create_user(username=email)
+            UserProfile.objects.create(user=user, email=email, department_id=department_id)
+            url_id = '?department_id=' + department_id + '&user=' + str(user.id)
+            msg = '<a href=\"' + BASE_URL + url_id +'\">点击激活</a>'
+            print(msg)
+            send_mail('标题', '内容', settings.EMAIL_FROM, [email], html_message=msg)
         return Response(status=status.HTTP_200_OK)
 
 
@@ -599,3 +603,33 @@ class Register(APIView):
         user_profile.name = name
         user_profile.save()
         return Response(data=user.password, status=status.HTTP_200_OK)
+
+
+class AllStaffs(APIView):
+    def get(self, request):
+        project_id = request.GET.get('project_id')
+        all_staff = []
+        for item in UserProfile.objects.filter(license=0):
+            all_staff.append({
+                'key': item.user.id,
+                'name': item.name
+            })
+        staff = ProjectStaffSrializer(Project.objects.filter(id=project_id)[0]).data
+        data = { 'all_staff': all_staff, 'project_staff': staff['staff'] }
+        return Response(data)
+
+
+class ChangeStaff(APIView):
+    def post(self, request):
+        receive = request.data
+        project_id = receive['project_id']
+        staff_list = receive['staff_list'].split(',')
+        project = Project.objects.filter(id=project_id)[0]
+        user = User.objects.filter(id__in=staff_list)
+        for item in user:
+            project.staff.add(item)
+        project.staff.set(user)
+        return Response(ProjectInfoSerializer(project).data)
+
+
+
