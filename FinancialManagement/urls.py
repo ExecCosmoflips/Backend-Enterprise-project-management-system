@@ -39,6 +39,7 @@ urlpatterns = [
     path('api/send_email', views.SendEmail.as_view()),
     path('api/register', views.Register.as_view()),
     path('api/get_all_staff', views.AllStaffs.as_view()),
-    path('api/change_staff', views.ChangeStaff.as_view())
+    path('api/change_staff', views.ChangeStaff.as_view()),
+    path('api/user_request', views.UserRequest.as_view())
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -41,8 +41,10 @@ class Project(models.Model):
 
 class StaffRequest(models.Model):
     project = models.ForeignKey(Project, related_name='project_request', on_delete=models.CASCADE)
+    department = models.IntegerField(null=True)
     staff = models.ForeignKey(User, on_delete=models.CASCADE, related_name='staff_request')
     whether = models.IntegerField(default='0')
+    content = models.CharField(null=True, max_length=255)
 
 
 class FinancialModel(models.Model):
@@ -80,6 +82,8 @@ class Receivable(models.Model):
     number = models.IntegerField(blank=False)
     agreement = models.ImageField(upload_to='receivable-expend', null=True)
     time = models.DateField(default=timezone.now)
+    advance_state = models.IntegerField(default='0')
+    income_state = models.IntegerField(default='0')
 
 
 class Advance(models.Model):
