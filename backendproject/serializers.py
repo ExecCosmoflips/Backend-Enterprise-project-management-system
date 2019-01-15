@@ -31,7 +31,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('user', 'name', 'department_id', 'access', 'department_name')
+        fields = ('user', 'name', 'department_id', 'access', 'department_name', 'license', 'email', 'phone')
 
     def get_department_name(self, obj):
         return obj.department.name
@@ -76,4 +76,12 @@ class UserRequestSerializer(serializers.ModelSerializer):
 
     def get_project(self, obj):
         return ProjectSerializer(obj.project).data
+
+
+class ProjectStaffSrializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ('id', 'staff')
+    def get_staff(self, obj):
+        return UserInfoSerializer(obj.staff).data
 
