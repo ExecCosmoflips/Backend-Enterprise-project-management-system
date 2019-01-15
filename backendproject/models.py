@@ -16,7 +16,7 @@ class Department(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='userprofile', null=True)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, related_name='user_profile', null=True)
     access = models.IntegerField(default='0')
     license = models.IntegerField(default='0')
     name = models.CharField(max_length=10, null=True)
@@ -33,7 +33,7 @@ class Project(models.Model):
     content = models.CharField(max_length=500, default='')
     begin_time = models.DateField(default=timezone.now)
     end_time = models.DateField(default=timezone.now)
-    staff = models.ManyToManyField(User, related_name='project', null=True)
+    staff = models.ManyToManyField(User, related_name='staff_project', null=True)
 
     def __str__(self):
         return self.title
@@ -57,7 +57,7 @@ class Expend(models.Model):
     category = models.ForeignKey(FinancialModel, related_name='category', on_delete=models.PROTECT)
     title = models.CharField(max_length=30, default='')
     number = models.IntegerField(blank=False)
-    agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    agreement = models.ImageField(upload_to='expend', null=True)
     time = models.DateField(default=timezone.now)
 
     def __str__(self):
@@ -67,6 +67,7 @@ class Expend(models.Model):
 class ConfirmExpend(models.Model):
     project = models.ForeignKey(Project, related_name='project_confirm', on_delete=models.CASCADE)
     category = models.CharField(max_length=30, default='')
+    title = models.CharField(max_length=30, default='')
     number = models.IntegerField(blank=False)
     agreement = models.ImageField(upload_to='confirm-expend', null=True)
     time = models.DateField(default=timezone.now)
@@ -77,24 +78,26 @@ class Receivable(models.Model):
     category = models.ForeignKey(FinancialModel,on_delete=models.PROTECT)
     title = models.CharField(max_length=30, default='')
     number = models.IntegerField(blank=False)
-    agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    agreement = models.ImageField(upload_to='receivable-expend', null=True)
     time = models.DateField(default=timezone.now)
 
 
 class Advance(models.Model):
     project = models.ForeignKey(Project, related_name='project_advance', on_delete=models.CASCADE)
     category = models.CharField(max_length=30, default='')
+    title = models.CharField(max_length=30, default='')
     number = models.IntegerField(default='0')
-    agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    agreement = models.ImageField(upload_to='advance', null=True)
     time = models.DateField(default=timezone.now)
 
 
 class Income(models.Model):
     project = models.ForeignKey(Project, related_name='project_income', on_delete=models.CASCADE)
     category = models.CharField(max_length=30, default='')
+    title = models.CharField(max_length=30, default='')
     confirm_num = models.FloatField(default = '0')
     tax_rate = models.FloatField(blank = False)
-    agreement = models.ImageField(upload_to='confirm-expend', null=True)
+    agreement = models.ImageField(upload_to='income', null=True)
     time = models.DateField(default=timezone.now)
 
 
