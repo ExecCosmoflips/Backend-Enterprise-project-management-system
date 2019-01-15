@@ -375,9 +375,6 @@ class ListIncomeInfo(APIView):
 
 
 
-
-
-
 class ListUser(APIView):
     # 列出全部人员（用于项目管理员添加项目人员）
     def get(self, request):
@@ -460,19 +457,6 @@ class PastUserRequest(APIView):
         )
         return JsonResponse({'info': 'success'})
 
-
-class ListUserRequest(generics.ListCreateAPIView):
-    # 列出部门人员请求的列表
-
-    queryset = StaffRequest.objects.all()
-    serializer_class = ProjectSerializer
-
-    def get_queryset(self):
-        department_id = self.request.GET.get('department_id')
-        department = Department.objects.filter(id=department_id)
-        project = Project.objects.filter(department=department)
-        self.queryset = StaffRequest.objects.filter(project=project)
-        return self.queryset
 
 
 class AddFinancialModel(APIView):
@@ -608,14 +592,19 @@ class Register(APIView):
 class AllStaffs(APIView):
     def get(self, request):
         project_id = request.GET.get('project_id')
+        department_id = Project.objects.get(id=project_id).department_id
         all_staff = []
         for item in UserProfile.objects.filter(license=0):
+            other = 0
+            if item.department_id == department_id:
+                other = 1
             all_staff.append({
                 'key': item.user.id,
-                'name': item.name
+                'name': item.name,
+                'other': other
             })
         staff = ProjectStaffSrializer(Project.objects.filter(id=project_id)[0]).data
-        data = { 'all_staff': all_staff, 'project_staff': staff['staff'] }
+        data = {'all_staff': all_staff, 'project_staff': staff['staff']}
         return Response(data)
 
 
@@ -623,13 +612,40 @@ class ChangeStaff(APIView):
     def post(self, request):
         receive = request.data
         project_id = receive['project_id']
+        department_id = Project.objects.get(id=project_id).department_id
         staff_list = receive['staff_list'].split(',')
         project = Project.objects.filter(id=project_id)[0]
         user = User.objects.filter(id__in=staff_list)
         for item in user:
-            project.staff.add(item)
+            if user.profile.department_id == department_id:
+                project.staff.add(item)
+            else:
+                StaffRequest.objects.create(project=project, staff=user, whether=0, department=department_id,)
         project.staff.set(user)
         return Response(ProjectInfoSerializer(project).data)
 
+
+class UserRequest(APIView):
+    def post(self, request):
+        receive = request.data
+        request_id = receive['request_id']
+        content = receive['content']
+        whether = receive['whether']
+        staff_request = StaffRequest.objects.filter(id=request_id)[0]
+        staff = staff_request.staff
+        project = staff_request.project
+        if whether == 'true':
+            project.staff.add(staff)
+            staff_request.whether = 1
+        else:
+            staff_request.whether = -1
+            staff_request.content = content
+        staff_request.save()
+        return Response(staff_request.whether, status=status.HTTP_200_OK)
+
+    def get(self, request):
+        department_id = request.GET.get('department_id')
+        UserRequestSerializer(StaffRequest.objects.filter(department=department_id), many=True)
+        return Response(UserRequestSerializer(StaffRequest.objects.filter(department=department_id), many=True).data, status=status.HTTP_200_OK)
 
 

@@ -69,10 +69,10 @@ class UserRequestSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StaffRequest
-        fields = ('id', 'project', 'staff')
+        fields = ('id', 'project', 'department', 'whether', 'content', 'staff')
 
     def get_staff(self, obj):
-        return UserInfoSerializer(obj.staff).data
+        return UserSerializer(obj.staff).data
 
     def get_project(self, obj):
         return ProjectSerializer(obj.project).data
