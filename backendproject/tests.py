@@ -125,6 +125,27 @@ class ConfirmModelTest(TestCase):
 
     def tearDown(self):
         print("ConfirmExpendModel End!")
+        print('=============================')
+
+
+class FinancialModelTest(TestCase):
+
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        FinancialModel.objects.create(id='1', name="测试", number=500, status='0', project_id='1')
+        print("FinancialModelTest Start!")
+
+    def test_financial_model(self):
+        result = FinancialModel.objects.get(id='1')
+        self.assertEqual(result.name, "测试")
+
+    def tearDown(self):
+        print("FinancialModelTest End!")
+        print('=============================')
 
 
 suite = unittest.TestSuite()
@@ -134,6 +155,7 @@ suite.addTest(DepartmentModelTest("test_department_model"))
 suite.addTest(ProjectModelTest("test_project_model"))
 suite.addTest(UserModelTest("test_user_model"))
 suite.addTest(ConfirmModelTest("test_confirm_model"))
+suite.addTest(FinancialModelTest("test_financial_model"))
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
