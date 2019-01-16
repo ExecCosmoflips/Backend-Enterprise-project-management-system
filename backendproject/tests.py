@@ -100,7 +100,7 @@ class CompanyModelTest(TestCase):
         print("CompanyModelTest Start!")
 
     def test_company_model(self):
-        result=Company.objects.get(id=1)
+        result = Company.objects.get(id=1)
         self.assertEqual(result.name, "计蒜客")
 
     def tearDown(self):
@@ -108,13 +108,34 @@ class CompanyModelTest(TestCase):
         print('=============================')
 
 
+class ConfirmModelTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        ConfirmExpend.objects.create(id='1', category='水电费', title='', number=500, agreement='',
+                                     time=timezone.now(), project_id='1')
+        print("ConfirmModel Start!")
+
+    def test_confirm_model(self):
+        result = ConfirmExpend.objects.get(id=1)
+        self.assertEqual(result.number, 500)
+
+    def tearDown(self):
+        print("ConfirmExpendModel End!")
 
 
-# if __name__ == '__main__':
-#     suite = unittest.TestSuite()
-#     suite.addTest(UserModelTest("test_user_model"))
-#     runner = unittest.TextTestRunner()
-#     runner.run(suite)
+suite = unittest.TestSuite()
+suite.addTest(AdvanceModelTest("test_advance_model"))
+suite.addTest(CompanyModelTest("test_company_model"))
+suite.addTest(DepartmentModelTest("test_department_model"))
+suite.addTest(ProjectModelTest("test_project_model"))
+suite.addTest(UserModelTest("test_user_model"))
+suite.addTest(ConfirmModelTest("test_confirm_model"))
+runner = unittest.TextTestRunner()
+runner.run(suite)
 
 
 
