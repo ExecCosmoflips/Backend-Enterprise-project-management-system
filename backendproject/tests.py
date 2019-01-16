@@ -35,6 +35,7 @@ class UserModelTest(TestCase):
     def tearDown(self):
         User.objects.get(id=2).delete()
         print("UserModelTest End!")
+        print('=============================')
 
 
 class DepartmentModelTest(TestCase):
@@ -50,6 +51,7 @@ class DepartmentModelTest(TestCase):
     def tearDown(self):
         Department.objects.get(id=1).delete()
         print("DepartmentModelTest End!")
+        print('=============================')
 
 
 class ProjectModelTest(TestCase):
@@ -68,6 +70,7 @@ class ProjectModelTest(TestCase):
     def tearDown(self):
         Project.objects.get(id='1').delete()
         print("ProjectModelTest End!")
+        print('=============================')
 
 
 class AdvanceModelTest(TestCase):
@@ -88,6 +91,21 @@ class AdvanceModelTest(TestCase):
     def tearDown(self):
         Advance.objects.get(id='1').delete()
         print('AdvanceModelTest End')
+        print('=============================')
+
+
+class CompanyModelTest(TestCase):
+    def setUp(self):
+        Company.objects.create(id=1, name='计蒜客', logo='', time=timezone.now())
+        print("CompanyModelTest Start!")
+
+    def test_company_model(self):
+        result=Company.objects.get(id=1)
+        self.assertEqual(result.name, "计蒜客")
+
+    def tearDown(self):
+        print("CompanyModelTest End!")
+        print('=============================')
 
 
 
