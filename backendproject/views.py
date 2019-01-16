@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
@@ -29,11 +31,6 @@ class ProjectList(generics.ListCreateAPIView):
         department = Department.objects.filter(id=department_id)[0]
         self.queryset = Project.objects.filter(department_id=department)
         return self.queryset
-
-    def post(self, request, *args, **kwargs):
-        receive = request.data
-        print(receive['department_id'])
-        Project.objects.create()
 
 
 class ProjectInfo(APIView):
@@ -69,18 +66,17 @@ class Login(APIView):
         receive = request.data
         username = receive['userName']
         password = receive['password']
-        print(username)
-
         user = auth.authenticate(username=username, password=password)
         if user:
-            serializer = UserSerializer(user)
-            print(user)
-            Token.objects.filter(user=user).delete()
-            token = Token.objects.create(user=user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(data={'token': 'super_admin'})
+            print(user.id)
+            return Response({'id': user.id, 'token': 'admin'}, status=status.HTTP_200_OK)
+        return Response(data={'token': 'admin'})
 
     def get(self, request):
+        ACCESS=['project_staff', 'department_manager', 'super_admin', 'finance', 'admin']
+        id = request.GET.get('id')
+        print(id)
+        user = User.objects.get(id=id)
         data = {
             'name': 'super_admin',
             'user_id': '1',
@@ -88,6 +84,14 @@ class Login(APIView):
             'token': 'super_admin',
             'avator': 'https://file.iviewui.com/dist/a0e88e83800f138b94d2414621bd9704.png'
         }
+        data = {
+            'name': user.profile.name,
+            'user_id': user.id,
+            'department_id': user.profile.department_id,
+            'access': ACCESS[user.profile.access],
+            'token': ACCESS[user.profile.access]
+        }
+        print(ACCESS[user.profile.access])
         return Response(data=data)
 
 
@@ -108,7 +112,7 @@ class DepartmentStaff(generics.ListCreateAPIView):
 
     def get_queryset(self):
         department_id = self.request.GET.get('department_id')
-        self.queryset = Department.objects.filter(id=department_id)[0].userprofile
+        self.queryset = Department.objects.filter(id=department_id)[0].user_profile
         return self.queryset
 
 
@@ -374,7 +378,6 @@ class ListIncomeInfo(APIView):
         return JsonResponse(income, safe=False)
 
 
-
 class ListUser(APIView):
     # 列出全部人员（用于项目管理员添加项目人员）
     def get(self, request):
@@ -458,28 +461,47 @@ class PastUserRequest(APIView):
         return JsonResponse({'info': 'success'})
 
 
-
 class AddFinancialModel(APIView):
     # 给项目添加编辑财务模型
-    def post(self, request):
-        name = self.request.POST.get('name')
-        number = self.request.POST.get('number')
-        status_name = self.request.POST.get('status')
-        if status_name == '费用类别':
-            status = 0
-            FinancialModel.objects.create(
-                name=name,
-                number=number,
-                status=status
-            )
-        elif status_name == '收入类别':
-            status = 1
-            FinancialModel.objects.create(
-                name=name,
-                number=number,
-                status=status
-            )
-        return JsonResponse({'info': 'success'})
+
+    def get(self, request):
+        data = request.GET.getlist('data[]')
+        project_id = request.GET.get('project_id')
+
+        for item in data:
+            item = json.loads(item)
+            print(item)
+            if item['status'] != 0:
+                # model = FinancialModel.objects.filter(id=item['id'])
+                # model.project_id = project_id
+                # model.status = item['status']
+                # model.name = item['name'],
+                # model.number
+                id = item['id']
+                if id != 0:
+                    model = FinancialModel(
+                        id=item['id'],
+                        project_id=project_id,
+                        status=item['status'], name=item['name'],
+                        number=item['number'])
+                    model.save()
+                else:
+                    model = FinancialModel(
+                        project_id=project_id,
+                        status=item['status'], name=item['name'],
+                        number=item['number'])
+                    model.save()
+
+        return Response({'info': 'success'})
+
+
+class GetFinancialModel(APIView):
+    # 给项目添加编辑财务模型
+    def get(self, request):
+        project_id = request.GET.get('project_id')
+        model = FinancialModel.objects.filter(project_id=project_id)
+        data = FinancialModelSerializer(model, many=True).data
+        return Response(data)
 
 
 class CheckReceivableList(APIView):
@@ -603,7 +625,7 @@ class AllStaffs(APIView):
                 'name': item.name,
                 'other': other
             })
-        staff = ProjectStaffSrializer(Project.objects.filter(id=project_id)[0]).data
+        staff = ProjectStaffSerializer(Project.objects.filter(id=project_id)[0]).data
         data = {'all_staff': all_staff, 'project_staff': staff['staff']}
         return Response(data)
 
@@ -620,7 +642,7 @@ class ChangeStaff(APIView):
             if user.profile.department_id == department_id:
                 project.staff.add(item)
             else:
-                StaffRequest.objects.create(project=project, staff=user, whether=0, department=department_id,)
+                StaffRequest.objects.create(project=project, staff=user, whether=0, department=department_id)
         project.staff.set(user)
         return Response(ProjectInfoSerializer(project).data)
 
@@ -647,5 +669,14 @@ class UserRequest(APIView):
         department_id = request.GET.get('department_id')
         UserRequestSerializer(StaffRequest.objects.filter(department=department_id), many=True)
         return Response(UserRequestSerializer(StaffRequest.objects.filter(department=department_id), many=True).data, status=status.HTTP_200_OK)
+
+
+class CloseProject(APIView):
+    def get(self, request):
+        project_id = request.GET.get('project_id')
+        project = Project.objects.filter(id=project_id)[0]
+        project.status = 0
+        project.save()
+        return Response(status=status.HTTP_200_OK)
 
 

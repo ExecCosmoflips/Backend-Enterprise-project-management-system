@@ -22,9 +22,9 @@ from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',TemplateView.as_view(template_name='index.html')),
-    url(r'api/get_project_list', views.ProjectList.as_view()),
-    url(r'api/login', views.Login.as_view()),
+    path('', TemplateView.as_view(template_name='index.html')),
+    path('api/get_project_list', views.ProjectList.as_view()),
+    path('api/login', views.Login.as_view()),
     path('api/get_info', views.Login.as_view()),
     path('api/get_project_info', views.ProjectInfo.as_view()),
     path('api/get_project_personnel_info', views.PersonnelInfo.as_view()),
@@ -40,6 +40,9 @@ urlpatterns = [
     path('api/register', views.Register.as_view()),
     path('api/get_all_staff', views.AllStaffs.as_view()),
     path('api/change_staff', views.ChangeStaff.as_view()),
-    path('api/user_request', views.UserRequest.as_view())
+    path('api/user_request', views.UserRequest.as_view()),
+    path('api/add_financial', views.AddFinancialModel.as_view()),
+    path('api/get_financial', views.GetFinancialModel.as_view()),
+    path('api/close_project', views.CloseProject.as_view())
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

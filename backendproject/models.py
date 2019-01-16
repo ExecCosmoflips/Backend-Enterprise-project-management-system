@@ -24,6 +24,9 @@ class UserProfile(models.Model):
     email = models.CharField(max_length=20, null=True)
     phone = models.CharField(max_length=20, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Project(models.Model):
 
@@ -34,6 +37,7 @@ class Project(models.Model):
     begin_time = models.DateField(default=timezone.now)
     end_time = models.DateField(default=timezone.now)
     staff = models.ManyToManyField(User, related_name='staff_project', null=True)
+    status = models.IntegerField(default=1)
 
     def __str__(self):
         return self.title
@@ -52,6 +56,9 @@ class FinancialModel(models.Model):
     number = models.IntegerField(default='0')
     status = models.IntegerField(default='0')
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='project_financial')
+
+    def __str__(self):
+        return self.name
 
 
 class Expend(models.Model):
@@ -73,6 +80,9 @@ class ConfirmExpend(models.Model):
     number = models.IntegerField(blank=False)
     agreement = models.ImageField(upload_to='confirm-expend', null=True)
     time = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return self.title
 
 
 class Receivable(models.Model):
@@ -110,6 +120,5 @@ class Company(models.Model):
     logo = models.ImageField(upload_to='logo')
     time = models.DateField(default=timezone.now)
 
-
-
-
+    def __str__(self):
+        return self.name
