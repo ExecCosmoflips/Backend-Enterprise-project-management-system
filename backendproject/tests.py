@@ -8,18 +8,32 @@ import unittest
 # Create your tests here.
 
 
-# class SimpleTest(TestCase):
-#     def test_details(self):
-#         data = {
-#             'username': 'wang',
-#             'password': '123456',
-#             'name': 'cat'
-#         }
-#         response = self.client.post('/api/register', data)
-#         self.assertEqual(response.status_code, 200)
-#         response_data = response.data
-#         print(response_data)
-#         self.assertEqual(response_data, data['name'])
+class RegisterAPITest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        UserProfile.objects.create(id='1', access='0', license= '0', name='test',
+                                   gender='0', email='test@qq.com', phone='110',
+                                   department_id='2', user_id='3')
+        print("RegisterAPITest Start!")
+
+    def test_register_api(self):
+        data = {
+            'user': '3',
+            'username': 'wang',
+            'password': '123456',
+            'name': 'cat'
+        }
+        response = self.client.post('/api/register', data)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.data
+        print(response_data)
+        #self.assertEqual(response_data, data['name'])
+
+    def tearDown(self):
+        #User.objects.get(id=2).delete()
+        print("RegisterAPITest End!")
+        print('=============================')
 
 
 class UserModelTest(TestCase):
@@ -253,11 +267,6 @@ class IncomeModelTest(TestCase):
         print('=============================')
 
 
-
-
-
-
-
 suite = unittest.TestSuite()
 suite.addTest(AdvanceModelTest("test_advance_model"))
 suite.addTest(CompanyModelTest("test_company_model"))
@@ -271,6 +280,7 @@ suite.addTest(RequestModelTest("test_request_model"))
 suite.addTest(ReceivableModelTest("test_receivable_model"))
 suite.addTest(ProfileModelTest("test_profile_model"))
 suite.addTest(IncomeModelTest("test_income_model"))
+suite.addTest(RegisterAPITest("test_register_api"))
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
