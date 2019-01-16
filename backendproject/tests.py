@@ -25,7 +25,7 @@ import unittest
 class UserModelTest(TestCase):
     def setUp(self):
         User.objects.create(id="2", username="wang", password="123456")
-        print("Test Start!")
+        print("UserModelTest Start!")
 
     def test_user_model(self):
        # self.assertEqual(DepartmentList(), {[{'department_leader': '1', 'department_name': '人事部'}]})
@@ -34,14 +34,14 @@ class UserModelTest(TestCase):
 
     def tearDown(self):
         User.objects.get(id=2).delete()
-        print("Test End!")
+        print("UserModelTest End!")
 
 
 class DepartmentModelTest(TestCase):
     def setUp(self):
-        User.objects.create(username="wang2", password="123456")
+        User.objects.create(id='1', username="wang2", password="123456")
         Department.objects.create(id='1', name="人事部", leader_id=1)
-        print("Test Start!")
+        print("DepartmentModelTest Start!")
 
     def test_department_model(self):
         dep_result = Department.objects.get(id='1')
@@ -49,8 +49,7 @@ class DepartmentModelTest(TestCase):
 
     def tearDown(self):
         Department.objects.get(id=1).delete()
-        print("Test End!")
-
+        print("DepartmentModelTest End!")
 
 
 class ProjectModelTest(TestCase):
@@ -60,15 +59,36 @@ class ProjectModelTest(TestCase):
         Project.objects.create(id='1', content="Test", title="长江工程",
                                begin_time=timezone.now(), end_time=timezone.now()+timezone.timedelta(3),
                                department_id='2', leader_id='3')
-        print("Test Start!")
+        print("ProjectModelTest Start!")
 
     def test_project_model(self):
-        result=Project.objects.get(id='1')
+        result = Project.objects.get(id='1')
         self.assertEqual(result.title, "长江工程")
 
     def tearDown(self):
         Project.objects.get(id='1').delete()
-        print("Test End!")
+        print("ProjectModelTest End!")
+
+
+class AdvanceModelTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='4', username="wang2", password="123456")
+        Department.objects.create(id='3', name="工程部", leader_id='4')
+        Project.objects.create(id='2', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='3', leader_id='4')
+        Advance.objects.create(id='1', category='', title='', number=500, agreement=None,
+                               time=timezone.now(), project_id='2')
+        print("AdvanceModelTest Start")
+
+    def test_advance_model(self):
+        result = Advance.objects.get(id='1')
+        self.assertEqual(result.number, 500)
+
+    def tearDown(self):
+        Advance.objects.get(id='1').delete()
+        print('AdvanceModelTest End')
+
 
 
 
