@@ -12,7 +12,7 @@ class RegisterAPITest(TestCase):
     def setUp(self):
         User.objects.create(id='3', username="wang2", password="123456")
         Department.objects.create(id='2', name="工程部", leader_id='3')
-        UserProfile.objects.create(id='1', access='0', license= '0', name='test',
+        UserProfile.objects.create(id='1', access='0', license='0', name='test',
                                    gender='0', email='test@qq.com', phone='110',
                                    department_id='2', user_id='3')
         print("RegisterAPITest Start!")
@@ -34,6 +34,32 @@ class RegisterAPITest(TestCase):
         #User.objects.get(id=2).delete()
         print("RegisterAPITest End!")
         print('=============================')
+
+
+
+class IncomeTitleListApiTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        Income.objects.create(id='1', category="test", project_id='1', title='test',
+                              agreement='', time=timezone.now(), confirm_num='0', tax_rate='0')
+        print("IncomeTitleListApiTest Start!")
+
+    def test_income_list(self):
+        data = {
+            'project_id': '1'
+        }
+        response = self.client.get('/api/get_income_title_list', data)
+        self.assertEqual(response.status_code, 200)
+        # response_data = response.data
+        # print(response_data)
+        #self.assertEqual(response_data, data['name'])
+
+    def tearDown(self):
+        print("IncomeTitleListApiTest End!")
 
 
 class UserModelTest(TestCase):
@@ -281,6 +307,7 @@ suite.addTest(ReceivableModelTest("test_receivable_model"))
 suite.addTest(ProfileModelTest("test_profile_model"))
 suite.addTest(IncomeModelTest("test_income_model"))
 suite.addTest(RegisterAPITest("test_register_api"))
+suite.addTest(IncomeTitleListApiTest("test_income_list"))
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
