@@ -148,6 +148,29 @@ class FinancialModelTest(TestCase):
         print('=============================')
 
 
+class ExpendModelTest(TestCase):
+
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        FinancialModel.objects.create(id='1', name="测试", number=500, status='0', project_id='1')
+        Expend.objects.create(id='1', title="test", number=500, agreement='', time=timezone.now(),
+                              category_id='1', project_id='1')
+
+        print("ExpendModelTest Start!")
+
+    def test_expend_model(self):
+        result = Expend.objects.get(id='1')
+        self.assertEqual(result.title, "test")
+
+    def tearDown(self):
+        print("ExpendModelTest End!")
+        print('=============================')
+
+
 suite = unittest.TestSuite()
 suite.addTest(AdvanceModelTest("test_advance_model"))
 suite.addTest(CompanyModelTest("test_company_model"))
@@ -156,6 +179,8 @@ suite.addTest(ProjectModelTest("test_project_model"))
 suite.addTest(UserModelTest("test_user_model"))
 suite.addTest(ConfirmModelTest("test_confirm_model"))
 suite.addTest(FinancialModelTest("test_financial_model"))
+suite.addTest(ExpendModelTest("test_expend_model"))
+
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
