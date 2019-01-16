@@ -110,7 +110,7 @@ class Income(models.Model):
     category = models.CharField(max_length=30, default='')
     title = models.CharField(max_length=30, default='')
     confirm_num = models.FloatField(default = '0')
-    tax_rate = models.FloatField(blank = False)
+    tax_rate = models.FloatField(blank=False)
     agreement = models.ImageField(upload_to='income', null=True)
     time = models.DateField(default=timezone.now)
 
