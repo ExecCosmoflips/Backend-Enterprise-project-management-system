@@ -171,6 +171,30 @@ class ExpendModelTest(TestCase):
         print('=============================')
 
 
+class RequestModelTest(TestCase):
+
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        StaffRequest.objects.create(id='1', whether='0', content='test', project_id='1',
+                                    staff_id='3')
+
+        print("RequestModelTest Start!")
+
+    def test_request_model(self):
+        result=StaffRequest.objects.get(id="1")
+        self.assertEqual(result.content, 'test')
+
+    def tearDown(self):
+        print("RequestModelTest End!")
+        print('=============================')
+
+
+
+
 suite = unittest.TestSuite()
 suite.addTest(AdvanceModelTest("test_advance_model"))
 suite.addTest(CompanyModelTest("test_company_model"))
@@ -180,6 +204,7 @@ suite.addTest(UserModelTest("test_user_model"))
 suite.addTest(ConfirmModelTest("test_confirm_model"))
 suite.addTest(FinancialModelTest("test_financial_model"))
 suite.addTest(ExpendModelTest("test_expend_model"))
+suite.addTest(RequestModelTest("test_request_model"))
 
 runner = unittest.TextTestRunner()
 runner.run(suite)
