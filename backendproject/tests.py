@@ -230,6 +230,32 @@ class ProfileModelTest(TestCase):
 
     def tearDown(self):
         print("ProfileModelTest End!")
+        print('=============================')
+
+
+class IncomeModelTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        Income.objects.create(id='1', category="test", project_id='1', title='test',
+                              agreement='', time=timezone.now(), confirm_num='0', tax_rate='0')
+        print("IncomeModelTest Start!")
+
+    def test_income_model(self):
+        result = Income.objects.get(id='1')
+        self.assertEqual(result.category, "test")
+
+    def tearDown(self):
+        print("IncomeModelTest End!")
+        print('=============================')
+
+
+
+
+
 
 
 suite = unittest.TestSuite()
@@ -244,6 +270,7 @@ suite.addTest(ExpendModelTest("test_expend_model"))
 suite.addTest(RequestModelTest("test_request_model"))
 suite.addTest(ReceivableModelTest("test_receivable_model"))
 suite.addTest(ProfileModelTest("test_profile_model"))
+suite.addTest(IncomeModelTest("test_income_model"))
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
