@@ -215,6 +215,23 @@ class ReceivableModelTest(TestCase):
         print('=============================')
 
 
+class ProfileModelTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        UserProfile.objects.create(id='1', access='0', license= '0', name='test',
+                                   gender='0', email='test@qq.com', phone='110',
+                                   department_id='2', user_id='3')
+        print("ProfileModelTest Start!")
+
+    def test_profile_model(self):
+        result = UserProfile.objects.get(id='1')
+        self.assertEqual(result.name, 'test')
+
+    def tearDown(self):
+        print("ProfileModelTest End!")
+
+
 suite = unittest.TestSuite()
 suite.addTest(AdvanceModelTest("test_advance_model"))
 suite.addTest(CompanyModelTest("test_company_model"))
@@ -226,6 +243,7 @@ suite.addTest(FinancialModelTest("test_financial_model"))
 suite.addTest(ExpendModelTest("test_expend_model"))
 suite.addTest(RequestModelTest("test_request_model"))
 suite.addTest(ReceivableModelTest("test_receivable_model"))
+suite.addTest(ProfileModelTest("test_profile_model"))
 runner = unittest.TextTestRunner()
 runner.run(suite)
 
