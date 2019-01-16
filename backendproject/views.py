@@ -57,7 +57,6 @@ class ProjectInfo(APIView):
         project.content = receive['content']
         project.begin_time = receive['begin_time'][0:10]
         project.end_time = receive['end_time'][0:10]
-        print(project.leader)
         project.save()
         serializer = ProjectInfoSerializer(project)
         return Response(serializer.data)
@@ -79,22 +78,13 @@ class Login(APIView):
         password = receive['password']
         user = auth.authenticate(username=username, password=password)
         if user:
-            print(user.id)
             return Response({'id': user.id, 'token': 'admin'}, status=status.HTTP_200_OK)
         return Response(data={'token': 'admin'})
 
     def get(self, request):
-        ACCESS = ['project_staff', 'department_manager', 'super_admin', 'finance', 'admin']
+        ACCESS = ['project_staff', 'super_admin', 'finance', 'department_manager', 'admin']
         id = request.GET.get('id')
-        print(id)
         user = User.objects.get(id=id)
-        data = {
-            'name': 'super_admin',
-            'user_id': '1',
-            'access': ['super_admin', 'admin'],
-            'token': 'super_admin',
-            'avator': 'https://file.iviewui.com/dist/a0e88e83800f138b94d2414621bd9704.png'
-        }
         data = {
             'name': user.profile.name,
             'user_id': user.id,
@@ -102,7 +92,6 @@ class Login(APIView):
             'access': ACCESS[user.profile.access],
             'token': ACCESS[user.profile.access]
         }
-        print(ACCESS[user.profile.access])
         return Response(data=data)
 
 
@@ -201,17 +190,18 @@ class GetProjectBarData(APIView):
         end_time = date(year=start_time.year + 3, month=start_time.month, day=start_time.day)
         income = project.project_income.filter(time__range=(start_time, end_time))
         income_list = []
+
         for item in income:
             income_list.append({
-                'date': item.time,
+                'date': str(item.time)[0:],
                 'number': item.confirm_num
             })
         expend_list = []
         expend = project.project_confirm.filter(time__range=(start_time, end_time))
         for item in expend:
             expend_list.append({
-                'date': item.time,
-                'number': item.confirm_num
+                'date': str(item.time)[0:7],
+                'number': item.number
             })
         data = {
             'expendList': expend_list,
@@ -226,10 +216,17 @@ class GetProjectPieData(APIView):
         id = request.GET.get('project_id')
         begin_time = request.GET.get('begin_time')
         end_time = request.GET.get('end_time')
-        project = Project.objects.filter(id=id)[0]
-        data = project.project_income.filter(
-            time__range=(begin_time, end_time)).values('category').annotate(value=Sum('confirm_num'))
-        return Response(data, status=status.HTTP_200_OK)
+        if begin_time and end_time :
+            project = Project.objects.filter(id=id)[0]
+            income = project.project_income.filter(
+                time__range=(begin_time[:10], end_time[:10])).values('category').annotate(value=Sum('confirm_num'))
+            expend = project.project_confirm.filter(
+                time__range=(begin_time[:10], end_time[:10])).values('category').annotate(value=Sum('number'))
+        else:
+            project = Project.objects.filter(id=id)[0]
+            income = project.project_income.values('category').annotate(value=Sum('confirm_num'))
+            expend = project.project_confirm.values('category').annotate(value=Sum('number'))
+        return Response({ 'income': income, 'expend': expend}, status=status.HTTP_200_OK)
 
 
 class ConfirmExpendListForExpend(APIView):
@@ -840,3 +837,16 @@ class GetFinancialModel(APIView):
         model = FinancialModel.objects.filter(project_id=project_id)
         data = FinancialModelSerializer(model, many=True).data
         return Response(data)
+
+
+class AddProject(APIView):
+    def post(self, request):
+        receive = request.data
+        project = Project.objects.create(title=receive['title'],
+                                         leader_id=receive['leader'],
+                                         begin_time=receive['begin_time'][:10],
+                                         end_time=receive['end_time'][:10],
+                                         content=receive['content'],
+                                         department_id=receive['department_id']
+                                         )
+        return Response(ProjectSerializer(project).data)
