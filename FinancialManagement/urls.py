@@ -43,6 +43,19 @@ urlpatterns = [
     path('api/user_request', views.UserRequest.as_view()),
     path('api/add_financial', views.AddFinancialModel.as_view()),
     path('api/get_financial', views.GetFinancialModel.as_view()),
-    path('api/close_project', views.CloseProject.as_view())
+    path('api/close_project', views.CloseProject.as_view()),
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/put_expend_info', views.CheckExpend.as_view()),
+    path('api/get_project_list_by_id', views.ListProjectById.as_view()),
+    path('api/get_category_list2', views.ListCategoryForExpend.as_view()),
+    path('api/get_project_list_by_id2', views.ListProjectById.as_view()),
+    path('api/get_category_list3', views.ListCategoryForReceivable.as_view()),
+    path('api/put_list_receivable_info', views.CheckReceivableList.as_view()),
+    path('api/addreceivable', views.AddReceivable.as_view()),
+    path('api/get_category_for_add_receivable', views.ListAddReceivable.as_view()),
+    path('api/get_project_list_by_id_for_add_receivable', views.ListProjectById.as_view()),
+    path('api/addexpend', views.AddExpend.as_view()),
+    path('api/get_category_for_add_expend', views.ListAddExpend.as_view()),
+    path('api/get_project_list_by_id_for_add_expend', views.ListProjectById.as_view()),
+
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
