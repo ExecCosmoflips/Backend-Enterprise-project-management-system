@@ -44,7 +44,21 @@ urlpatterns = [
     path('api/add_financial', views.AddFinancialModel.as_view()),
     path('api/get_financial', views.GetFinancialModel.as_view()),
     path('api/close_project', views.CloseProject.as_view()),
-
+    path('api/get_department_list_for_advance', views.DepartmentListForAdvance.as_view()),
+    path('api/get_receivable_list_for_advance', views.ReceivableListForAdvance.as_view()),
+    path('api/get_receivable_list_for_income', views.ReceivableListForIncome.as_view()),
+    path('api/record_advance', views.RecordAdvance.as_view()),
+    path('api/confirm_income', views.ConfirmIncome.as_view()),
+    path('api/confirm_expend', views.ConfirmExpend.as_view()),
+    path('api/list_advance_info', views.ListAdvanceInfo.as_view()),
+    path('api/get_confirm_expend_list_for_expend', views.ConfirmExpendListForExpend.as_view()),
+    path('api/list_confirm_expend_info', views.ListConfirmExpendInfo.as_view()),
+    path('api/list_income_info', views.ListIncomeInfo.as_view()),
+    path('api/get_expend_list', views.ExpendListForExpend.as_view()),
+    path('api/get_advance_title_list', views.AdvanceTitleList.as_view()),
+    path('api/get_income_title_list', views.IncomeTitleList.as_view()),
+    path('api/use_category_get_receivable', views.UseCategoryGetReceivable.as_view()),
+    path('api/category_get_receivable_for_income', views.UseCategoryGetReceivableForIncome.as_view()),
     path('api/put_expend_info', views.CheckExpend.as_view()),
     path('api/get_project_list_by_id', views.ListProjectById.as_view()),
     path('api/get_category_list2', views.ListCategoryForExpend.as_view()),
@@ -58,4 +72,4 @@ urlpatterns = [
     path('api/get_category_for_add_expend', views.ListAddExpend.as_view()),
     path('api/get_project_list_by_id_for_add_expend', views.ListProjectById.as_view()),
 
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
