@@ -52,11 +52,32 @@ class DepartmentModelTest(TestCase):
         print("Test End!")
 
 
-if __name__ == '__main__':
-    suite = unittest.TestSuite()
-    suite.addTest(UserModelTest("test_user_model"))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
+
+class ProjectModelTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now()+timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        print("Test Start!")
+
+    def test_project_model(self):
+        result=Project.objects.get(id='1')
+        self.assertEqual(result.title, "长江工程")
+
+    def tearDown(self):
+        Project.objects.get(id='1').delete()
+        print("Test End!")
+
+
+
+# if __name__ == '__main__':
+#     suite = unittest.TestSuite()
+#     suite.addTest(UserModelTest("test_user_model"))
+#     runner = unittest.TextTestRunner()
+#     runner.run(suite)
+
 
 
 
