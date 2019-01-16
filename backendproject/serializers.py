@@ -8,7 +8,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id', 'department', 'leader', 'full_name', 'title', 'content', 'begin_time', 'end_time')
+        fields = ('id', 'department', 'leader', 'full_name', 'title', 'content', 'begin_time', 'end_time', 'status')
 
     def get_full_name(self, obj):
         return obj.leader.profile.name
@@ -57,7 +57,7 @@ class ProjectInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('id', 'title', 'leader', 'content', 'begin_time', 'end_time', 'staff')
+        fields = ('id', 'title', 'leader', 'content', 'begin_time', 'end_time', 'staff', 'status')
 
     def get_leader(self, obj):
         return UserSerializer(obj.leader).data
@@ -78,10 +78,17 @@ class UserRequestSerializer(serializers.ModelSerializer):
         return ProjectSerializer(obj.project).data
 
 
-class ProjectStaffSrializer(serializers.ModelSerializer):
+class ProjectStaffSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'staff')
+
     def get_staff(self, obj):
         return UserInfoSerializer(obj.staff).data
+
+
+class FinancialModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialModel
+        fields = ('id', 'name', 'number', 'status')
 
