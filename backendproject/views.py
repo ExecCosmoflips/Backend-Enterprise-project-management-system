@@ -826,6 +826,7 @@ class ConfirmIncome(APIView):
 class AllStaffs(APIView):
     def get(self, request):
         project_id = request.GET.get('project_id')
+        print(project_id)
         department_id = Project.objects.get(id=project_id).department_id
         all_staff = []
         for item in UserProfile.objects.filter(license=0):
@@ -844,7 +845,6 @@ class AllStaffs(APIView):
             Project.objects.filter(
                 id=project_id)[0]).data
         data = {'all_staff': all_staff, 'project_staff': staff['staff']}
-        print(data)
         return Response(data)
 
 
@@ -852,21 +852,30 @@ class ChangeStaff(APIView):
     def post(self, request):
         receive = request.data
         project_id = receive['project_id']
-        department_id = Project.objects.get(id=project_id).department_id
-        staff_list = receive['staff_list'].split(',')
+        direction = receive['direction']
+        moveKeys = receive['moveKeys'].split(',')
         project = Project.objects.filter(id=project_id)[0]
-        user = User.objects.filter(id__in=staff_list)
-        for item in user:
-            if item.profile.department_id == department_id:
+        user = User.objects.filter(id__in=moveKeys)
+        if direction == 'left':
+            for item in user:
+                project.staff.remove(item)
+        else:
+            for item in user:
                 project.staff.add(item)
-            else:
-                StaffRequest.objects.create(
-                    project=project,
-                    staff=item,
-                    whether=0,
-                    department=department_id)
-        project.staff.set(user)
         return Response(ProjectInfoSerializer(project).data)
+        # project = Project.objects.filter(id=project_id)[0]
+        # user = User.objects.filter(id__in=staff_list)
+        # for item in user:
+        #     if item.profile.department_id == department_id:
+        #         project.staff.add(item)
+        #     else:
+        #         StaffRequest.objects.create(
+        #             project=project,
+        #             staff=item,
+        #             whether=0,
+        #             department=department_id)
+        # project.staff.set(user)
+
 
 
 class UserRequest(APIView):
