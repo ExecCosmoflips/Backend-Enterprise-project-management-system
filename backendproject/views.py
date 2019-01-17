@@ -251,16 +251,9 @@ class ConfirmExpendListForExpend(APIView):
         project = Project.objects.filter(id=project_id)[0]
         confirm_expend = []
         for item in ConfirmExpend.objects.filter(project=project):
-            confirm_expend.append(
-                {'confirm_expend_id': item.id, 'confirm_expend_category': item.category.category})
+            confirm_expend.append({'confirm_expend_id': item.id, 'confirm_expend_category': item.category,
+                                   'confirm_expend_title': item.title})
         return JsonResponse(confirm_expend, safe=False)
-
-
-class AdvanceImage(APIView):
-
-    def post(self, request):
-        name = self.request.POST.get('name')
-        print(name)
 
 
 class ListAdvanceInfo(APIView):
@@ -269,13 +262,11 @@ class ListAdvanceInfo(APIView):
         advance = []
         for item in Advance.objects.all():
             advance.append({
-                'department_id': item.receivable.project.department.id,
-                'department_name': item.receivable.project.department.name,
-                'project_id': item.receivable.project.id,
-                'project_title': item.receivable.project.title,
-                'receivable_id': item.receivable.id,
-                'receivable_title': item.receivable.title,
-                'receivable_num': item.receivable.number,
+                'department_id': item.project.department.id,
+                'department_name': item.project.department.name,
+                'project_id': item.project.id,
+                'project_title': item.project.title,
+                'receivable_title': item.title,
                 'advance_num': item.number})
         return JsonResponse(advance, safe=False)
 
@@ -291,7 +282,8 @@ class ListConfirmExpendInfo(APIView):
                 'project_id': item.project.id,
                 'project_title': item.project.title,
                 'confirm_expend_id': item.id,
-                'confirm_expend_title': item.category.title,
+                'confirm_expend_category': item.category,
+                'confirm_expend_title': item.title,
                 'confirm_expend_num': item.number
             })
         return JsonResponse(confirm_expend, safe=False)
@@ -307,9 +299,9 @@ class ListIncomeInfo(APIView):
                 'department_name': item.project.department.name,
                 'project_id': item.project.id,
                 'project_title': item.project.title,
-                'receivable_id': item.receivable.id,
-                'receivable_title': item.receivable.title,
-                'receivable_category': item.receivable.category,
+                'income_id': item.id,
+                'receivable_title': item.title,
+                'receivable_category': item.category,
                 'confirm_num': item.confirm_num,
                 'tax_rate': item.tax_rate
             })
@@ -692,10 +684,8 @@ class UseCategoryGetReceivable(APIView):
         receivable_category = self.request.GET.get('receivable_category')
         fm = FinancialModel.objects.filter(name=receivable_category)[0]
         receivable = []
-        for item in Receivable.objects.filter(
-                category=fm, advance_state='0', income_state='0'):
-            receivable.append(
-                {'receivable_id': item.id, 'receivable_title': item.title})
+        for item in Receivable.objects.filter(category=fm, advance_state='0', income_state='0'):
+            receivable.append({'receivable_id': item.id, 'receivable_title': item.title})
         return JsonResponse(receivable, safe=False)
 
 
@@ -705,10 +695,8 @@ class UseCategoryGetReceivableForIncome(APIView):
         receivable_category = self.request.GET.get('receivable_category')
         fm = FinancialModel.objects.filter(name=receivable_category)[0]
         receivable = []
-        for item in Receivable.objects.filter(
-                category=fm, advance_state='0', income_state='0'):
-            receivable.append(
-                {'receivable_id': item.id, 'receivable_title': item.title})
+        for item in Receivable.objects.filter(category=fm, advance_state='0', income_state='0'):
+            receivable.append({'receivable_id': item.id, 'receivable_title': item.title})
         return JsonResponse(receivable, safe=False)
 
 
@@ -939,3 +927,4 @@ class AddProject(APIView):
                                          department_id=receive['department_id']
                                          )
         return Response(ProjectSerializer(project).data)
+
