@@ -474,11 +474,13 @@ class ListProjectById(APIView):
     # project下拉
     #
     def get(self, request):
-        userid = self.request.GET.get('id')
-        project_id = UserProfile.objects.filter(id=userid)[0].license
-        print(project_id)
+        userid = self.request.GET.get('user_id')
+        print(self.request.GET)
+        user = User.objects.filter(id=userid)[0]
+        project = user.staff_project.all()
+        print(project)
         project_1 = []
-        for item in Project.objects.filter(id=project_id):
+        for item in project:
             project_1.append(
                 {'project_id': item.id, 'project_name': item.title})
             print(project_1)
