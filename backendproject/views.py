@@ -142,26 +142,6 @@ class ProjectListAll(APIView):
         return JsonResponse(project, safe=False)
 
 
-class getAddDepartmentAdmin(APIView):
-
-    def post(self, request):
-        department = self.request.POST.get('department')
-        username = self.request.POST.get('username')
-        name = self.request.POST.get('name')
-        email = self.request.POST.get('email')
-        gender = self.request.POST.get('gender')
-        phone = self.request.POST.get('phone')
-
-        Receivable.objects.create(
-            department=department,
-            username=username,
-            name=name,
-            email=email,
-            gender=gender,
-            phone=phone)
-        return JsonResponse({'info': 'success'})
-
-
 class GetAddTreasurer(APIView):
     def post(self, request):
         username = self.request.POST.get('username')
@@ -232,7 +212,7 @@ class GetProjectPieData(APIView):
             project = Project.objects.filter(id=id)[0]
             income = project.project_income.filter(
                 time__range=(begin_time[:10], end_time[:10])).values('category').annotate(
-                    value=Sum('confirm_num'))
+                value=Sum('confirm_num'))
             expend = project.project_confirm.filter(time__range=(
                 begin_time[:10], end_time[:10])).values('category').annotate(value=Sum('number'))
         else:
@@ -254,6 +234,7 @@ class ConfirmExpendListForExpend(APIView):
         for item in ConfirmExpend.objects.filter(project=project):
             confirm_expend.append({'confirm_expend_id': item.id, 'confirm_expend_category': item.category,
                                    'confirm_expend_title': item.title})
+            print(item.title)
         return JsonResponse(confirm_expend, safe=False)
 
 
@@ -633,7 +614,7 @@ class SendEmail(APIView):
             UserProfile.objects.create(
                 user=user, email=email, department_id=department_id)
             url_id = '?department_id=' + \
-                department_id + '&user=' + str(user.id)
+                     department_id + '&user=' + str(user.id)
             msg = '<a href=\"' + BASE_URL + url_id + '\">点击激活</a>'
             print(msg)
             send_mail(
@@ -764,7 +745,8 @@ class HandleConfirmExpend(APIView):
         project_id = self.request.POST.get('project_id')
         project = Project.objects.filter(id=project_id)[0]
         confirm_expend_title = self.request.POST.get('confirm_expend_title')
-        expend = Expend.objects.filter(id=confirm_expend_title)[0]
+        print(confirm_expend_title)
+        expend = Expend.objects.filter(title=confirm_expend_title)[0]
         category = expend.category.name
         confirm_expend_num = self.request.POST.get('confirm_expend_num')
         expend_agreement = self.request.FILES.get('expend_agreement')
@@ -803,6 +785,7 @@ class RecordAdvance(APIView):
 class ConfirmIncome(APIView):
 
     def post(self, request):
+        print(request.POST)
         project_id = self.request.POST.get('project_id')
         project = Project.objects.filter(id=project_id)[0]
         receivable_category = self.request.POST.get('receivable_category')
@@ -823,6 +806,8 @@ class ConfirmIncome(APIView):
         r = Receivable.objects.filter(title=receivable_title, category=fm)[0]
         r.income_state = 1
         r.save()
+        print(receivable_category)
+        print(receivable_title)
         return JsonResponse({'info': 'success'})
 
 
@@ -952,6 +937,7 @@ class GetFinancialModel(APIView):
 
 
 class AddProject(APIView):
+
     def post(self, request):
         receive = request.data
         project = Project.objects.create(title=receive['title'],
@@ -963,3 +949,53 @@ class AddProject(APIView):
                                          )
         return Response(ProjectSerializer(project).data)
 
+
+class AddNewDepartment(APIView):
+
+    def post(self, request):
+        department_name = self.request.POST.get('department_name')
+        try:
+            User.objects.create_user(username=department_name, password=department_name)
+            user = User.objects.filter(username=department_name)[0]
+            department = Department.objects.create(name=department_name, leader=user)
+            UserProfile.objects.create(access=3, department=department, user=user, name=user.username)
+            return JsonResponse({'info': 'success'})
+        except:
+            return JsonResponse({'info': 'failed'})
+
+
+class AddLeaderToNewDepartment(APIView):
+
+    def post(self, request):
+        department_name = self.request.POST.get('department_name')
+        username = self.request.POST.get('username')
+        name = self.request.POST.get('name')
+        email = self.request.POST.get('email')
+        phone = self.request.POST.get('phone')
+        sex = self.request.POST.get('sex')
+        try:
+            department = Department.objects.filter(name=department_name)[0]
+            department.leader = User.objects.create_user(username=username, password=username)
+            new_user = User.objects.filter(username=username)[0]
+            UserProfile.objects.create(user=new_user, name=name, email=email, access=3, phone=phone, gender=sex)
+            department.save()
+            return JsonResponse({'info': 'success'})
+        except:
+            return JsonResponse({'info': 'failed'})
+
+
+class AddFinancialStaff(APIView):
+
+    def post(self, request):
+        username = self.request.POST.get('username')
+        name = self.request.POST.get('name')
+        email = self.request.POST.get('email')
+        phone = self.request.POST.get('phone')
+        sex = self.request.POST.get('sex')
+        try:
+            User.objects.create_user(username=username, password=username)
+            new_user = User.objects.filter(username=username)[0]
+            UserProfile.objects.create(user=new_user, name=name, email=email, access=2, phone=phone, gender=sex)
+            return JsonResponse({'info': 'success'})
+        except:
+            return JsonResponse({'info': 'failed'})
