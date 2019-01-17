@@ -65,7 +65,6 @@ urlpatterns = [
     path('api/get_project_list_by_id2', views.ListProjectById.as_view()),
     path('api/get_category_list3', views.ListCategoryForReceivable.as_view()),
     path('api/put_list_receivable_info', views.CheckReceivableList.as_view()),
-    path('api/addreceivable', views.AddReceivable.as_view()),
     path('api/get_category_for_add_receivable', views.ListAddReceivable.as_view()),
     path('api/get_project_list_by_id_for_add_receivable', views.ListProjectById.as_view()),
     path('api/addexpend', views.AddExpend.as_view()),
