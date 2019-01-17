@@ -3,10 +3,7 @@ from builtins import int
 
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
-from django.contrib import auth
 from django.contrib.auth.hashers import make_password
-from rest_framework.authtoken.models import Token
 from .serializers import *
 from .models import *
 from rest_framework import generics
@@ -19,7 +16,6 @@ from django.db.models import Sum
 from backendproject import models
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models import Q
 
 
 # Create your views here.
@@ -67,7 +63,8 @@ class DepartmentListForAdvance(APIView):
     def get(self, request):
         department = []
         for item in Department.objects.all():
-            department.append({'department_id': item.id, 'department_name': item.name})
+            department.append(
+                {'department_id': item.id, 'department_name': item.name})
         return JsonResponse(department, safe=False)
 
 
@@ -78,11 +75,17 @@ class Login(APIView):
         password = receive['password']
         user = auth.authenticate(username=username, password=password)
         if user:
-            return Response({'id': user.id, 'token': 'admin'}, status=status.HTTP_200_OK)
+            return Response({'id': user.id, 'token': 'admin'},
+                            status=status.HTTP_200_OK)
         return Response(data={'token': 'admin'})
 
     def get(self, request):
-        ACCESS = ['project_staff', 'super_admin', 'finance', 'department_manager', 'admin']
+        ACCESS = [
+            'project_staff',
+            'super_admin',
+            'finance',
+            'department_manager',
+            'admin']
         id = request.GET.get('id')
         user = User.objects.get(id=id)
         data = {
@@ -112,7 +115,8 @@ class DepartmentStaff(generics.ListCreateAPIView):
 
     def get_queryset(self):
         department_id = self.request.GET.get('department_id')
-        self.queryset = Department.objects.filter(id=department_id)[0].user_profile
+        self.queryset = Department.objects.filter(id=department_id)[
+            0].user_profile
         return self.queryset
 
 
@@ -122,7 +126,8 @@ class DepartmentList(APIView):
     def get(self, request):
         department = []
         for item in Department.objects.all():
-            department.append({'department_id': item.id, 'department_name': item.name})
+            department.append(
+                {'department_id': item.id, 'department_name': item.name})
         return JsonResponse(department, safe=False)
 
 
@@ -131,7 +136,8 @@ class ProjectListAll(APIView):
     def get(self, request):
         project = []
         for item in Project.objects.all():
-            project.append({'project_id': item.id, 'project_title': item.title})
+            project.append(
+                {'project_id': item.id, 'project_title': item.title})
         return JsonResponse(project, safe=False)
 
 
@@ -187,17 +193,22 @@ class GetProjectBarData(APIView):
         id = request.GET.get('project_id')
         project = Project.objects.filter(id=id)[0]
         start_time = project.begin_time
-        end_time = date(year=start_time.year + 3, month=start_time.month, day=start_time.day)
-        income = project.project_income.filter(time__range=(start_time, end_time))
+        end_time = date(
+            year=start_time.year + 3,
+            month=start_time.month,
+            day=start_time.day)
+        income = project.project_income.filter(
+            time__range=(start_time, end_time))
         income_list = []
 
         for item in income:
             income_list.append({
-                'date': str(item.time)[0:],
+                'date': str(item.time)[0:7],
                 'number': item.confirm_num
             })
         expend_list = []
-        expend = project.project_confirm.filter(time__range=(start_time, end_time))
+        expend = project.project_confirm.filter(
+            time__range=(start_time, end_time))
         for item in expend:
             expend_list.append({
                 'date': str(item.time)[0:7],
@@ -216,17 +227,21 @@ class GetProjectPieData(APIView):
         id = request.GET.get('project_id')
         begin_time = request.GET.get('begin_time')
         end_time = request.GET.get('end_time')
-        if begin_time and end_time :
+        if begin_time and end_time:
             project = Project.objects.filter(id=id)[0]
             income = project.project_income.filter(
-                time__range=(begin_time[:10], end_time[:10])).values('category').annotate(value=Sum('confirm_num'))
-            expend = project.project_confirm.filter(
-                time__range=(begin_time[:10], end_time[:10])).values('category').annotate(value=Sum('number'))
+                time__range=(begin_time[:10], end_time[:10])).values('category').annotate(
+                    value=Sum('confirm_num'))
+            expend = project.project_confirm.filter(time__range=(
+                begin_time[:10], end_time[:10])).values('category').annotate(value=Sum('number'))
         else:
             project = Project.objects.filter(id=id)[0]
-            income = project.project_income.values('category').annotate(value=Sum('confirm_num'))
-            expend = project.project_confirm.values('category').annotate(value=Sum('number'))
-        return Response({ 'income': income, 'expend': expend}, status=status.HTTP_200_OK)
+            income = project.project_income.values(
+                'category').annotate(value=Sum('confirm_num'))
+            expend = project.project_confirm.values(
+                'category').annotate(value=Sum('number'))
+        return Response({'income': income, 'expend': expend},
+                        status=status.HTTP_200_OK)
 
 
 class ConfirmExpendListForExpend(APIView):
@@ -236,7 +251,8 @@ class ConfirmExpendListForExpend(APIView):
         project = Project.objects.filter(id=project_id)[0]
         confirm_expend = []
         for item in ConfirmExpend.objects.filter(project=project):
-            confirm_expend.append({'confirm_expend_id': item.id, 'confirm_expend_category': item.category.category})
+            confirm_expend.append(
+                {'confirm_expend_id': item.id, 'confirm_expend_category': item.category.category})
         return JsonResponse(confirm_expend, safe=False)
 
 
@@ -305,8 +321,10 @@ class ListUser(APIView):
     def get(self, request):
         list = []
         for item in UserProfile.objects.filter(license=1):
-            list.append(
-                {'user_id': item.id, 'name': item.name, 'email': item.email, 'department_id2': item.department.id})
+            list.append({'user_id': item.id,
+                         'name': item.name,
+                         'email': item.email,
+                         'department_id2': item.department.id})
         return JsonResponse(list, safe=False)
 
 
@@ -398,13 +416,29 @@ class ListUserRequest(generics.ListCreateAPIView):
 
 
 class AddFinancialModel(APIView):
-
     # 给项目添加编辑财务模型
+
     def get(self, request):
+        data = request.GET.getlist('data[]')
         project_id = request.GET.get('project_id')
-        model = FinancialModel.objects.filter(project_id=project_id)
-        data = FinancialModelSerializer(model, many=True).data
-        return Response(data)
+        for item in data:
+            item = json.loads(item)
+            if item['status'] != 0:
+                id = item['id']
+                if id != 0:
+                    model = FinancialModel(
+                        id=item['id'],
+                        project_id=project_id,
+                        status=item['status'], name=item['name'],
+                        number=item['number'])
+                    model.save()
+                else:
+                    model = FinancialModel(
+                        project_id=project_id,
+                        status=item['status'], name=item['name'],
+                        number=item['number'])
+                    model.save()
+        return Response({'info': 'success'})
 
 
 class CheckReceivableList(APIView):
@@ -440,7 +474,8 @@ class ListProjectById(APIView):
         print(project_id)
         project_1 = []
         for item in Project.objects.filter(id=project_id):
-            project_1.append({'project_id': item.id, 'project_name': item.title})
+            project_1.append(
+                {'project_id': item.id, 'project_name': item.title})
             print(project_1)
         return JsonResponse(project_1, safe=False)
 
@@ -452,7 +487,8 @@ class ListAddReceivable(APIView):
         project = Project.objects.filter(id=project_id)[0]
         category = []
         for item in FinancialModel.objects.filter(project=project, status=1):
-            category.append({'category_id': item.id, 'category_name': item.name})
+            category.append(
+                {'category_id': item.id, 'category_name': item.name})
         return JsonResponse(category, safe=False)
 
 
@@ -463,7 +499,8 @@ class ListAddExpend(APIView):
         project = Project.objects.filter(id=project_id)[0]
         category = []
         for item in FinancialModel.objects.filter(project=project, status=0):
-            category.append({'category_id': item.id, 'category_name': item.name})
+            category.append(
+                {'category_id': item.id, 'category_name': item.name})
         return JsonResponse(category, safe=False)
 
 
@@ -474,7 +511,8 @@ class ListCategoryForExpend(APIView):
         project = Project.objects.filter(id=project_id)[0]
         category = []
         for item in Expend.objects.filter(project=project):
-            category.append({'category_id': item.category.id, 'category_name': item.category.name})
+            category.append({'category_id': item.category.id,
+                             'category_name': item.category.name})
         return JsonResponse(category, safe=False)
 
 
@@ -485,7 +523,8 @@ class ListCategoryForReceivable(APIView):
         project = Project.objects.filter(id=project_id)[0]
         category = []
         for item in Receivable.objects.filter(project=project):
-            category.append({'category_id': item.category.id, 'category_name': item.category.name})
+            category.append({'category_id': item.category.id,
+                             'category_name': item.category.name})
         return JsonResponse(category, safe=False)
 
 
@@ -584,11 +623,18 @@ class SendEmail(APIView):
         print(department_id)
         if email and department_id:
             user = User.objects.create_user(username=email)
-            UserProfile.objects.create(user=user, email=email, department_id=department_id)
-            url_id = '?department_id=' + department_id + '&user=' + str(user.id)
+            UserProfile.objects.create(
+                user=user, email=email, department_id=department_id)
+            url_id = '?department_id=' + \
+                department_id + '&user=' + str(user.id)
             msg = '<a href=\"' + BASE_URL + url_id + '\">点击激活</a>'
             print(msg)
-            send_mail('标题', '内容', settings.EMAIL_FROM, [email], html_message=msg)
+            send_mail(
+                '标题',
+                '内容',
+                settings.EMAIL_FROM,
+                [email],
+                html_message=msg)
         return Response(status=status.HTTP_200_OK)
 
 
@@ -646,8 +692,10 @@ class UseCategoryGetReceivable(APIView):
         receivable_category = self.request.GET.get('receivable_category')
         fm = FinancialModel.objects.filter(name=receivable_category)[0]
         receivable = []
-        for item in Receivable.objects.filter(category=fm, advance_state='0', income_state='0'):
-            receivable.append({'receivable_id': item.id, 'receivable_title': item.title})
+        for item in Receivable.objects.filter(
+                category=fm, advance_state='0', income_state='0'):
+            receivable.append(
+                {'receivable_id': item.id, 'receivable_title': item.title})
         return JsonResponse(receivable, safe=False)
 
 
@@ -657,8 +705,10 @@ class UseCategoryGetReceivableForIncome(APIView):
         receivable_category = self.request.GET.get('receivable_category')
         fm = FinancialModel.objects.filter(name=receivable_category)[0]
         receivable = []
-        for item in Receivable.objects.filter(category=fm, advance_state='0', income_state='0'):
-            receivable.append({'receivable_id': item.id, 'receivable_title': item.title})
+        for item in Receivable.objects.filter(
+                category=fm, advance_state='0', income_state='0'):
+            receivable.append(
+                {'receivable_id': item.id, 'receivable_title': item.title})
         return JsonResponse(receivable, safe=False)
 
 
@@ -705,7 +755,7 @@ class ExpendListForExpend(APIView):
         return JsonResponse(expend, safe=False)
 
 
-class ConfirmExpend(APIView):
+class HandleConfirmExpend(APIView):
 
     def post(self, request):
         project_id = self.request.POST.get('project_id')
@@ -715,8 +765,12 @@ class ConfirmExpend(APIView):
         category = expend.category.name
         confirm_expend_num = self.request.POST.get('confirm_expend_num')
         expend_agreement = self.request.FILES.get('expend_agreement')
-        models.ConfirmExpend.objects.create(project=project, category=category, title=confirm_expend_title,
-                                            number=confirm_expend_num, agreement=expend_agreement)
+        models.ConfirmExpend.objects.create(
+            project=project,
+            category=category,
+            title=confirm_expend_title,
+            number=confirm_expend_num,
+            agreement=expend_agreement)
         return JsonResponse({'info': 'success'})
 
 
@@ -731,8 +785,12 @@ class RecordAdvance(APIView):
         advance_number = self.request.POST.get('advance_number')
         advance_number = int(advance_number)
         advance_agreement = self.request.FILES.get('advance_agreement')
-        Advance.objects.create(project=project, category=category, title=receivable_title,
-                               number=advance_number, agreement=advance_agreement)
+        Advance.objects.create(
+            project=project,
+            category=category,
+            title=receivable_title,
+            number=advance_number,
+            agreement=advance_agreement)
         r = Receivable.objects.filter(title=receivable_title, category=fm)[0]
         r.advance_state = 1
         r.save()
@@ -752,8 +810,13 @@ class ConfirmIncome(APIView):
         tax_rate = self.request.POST.get('tax_rate')
         tax_rate = float(tax_rate)
         income_agreement = self.request.FILES.get('income_agreement')
-        Income.objects.create(project=project, category=receivable_category, title=receivable_title,
-                              confirm_num=confirm_num, tax_rate=tax_rate, agreement=income_agreement)
+        Income.objects.create(
+            project=project,
+            category=receivable_category,
+            title=receivable_title,
+            confirm_num=confirm_num,
+            tax_rate=tax_rate,
+            agreement=income_agreement)
         r = Receivable.objects.filter(title=receivable_title, category=fm)[0]
         r.income_state = 1
         r.save()
@@ -769,13 +832,19 @@ class AllStaffs(APIView):
             other = 0
             if item.department_id == department_id:
                 other = 1
+            name = "未命名"
+            if item.name:
+                name = item.name
             all_staff.append({
                 'key': item.user.id,
-                'name': item.name,
+                'name': name,
                 'other': other
             })
-        staff = ProjectStaffSerializer(Project.objects.filter(id=project_id)[0]).data
+        staff = ProjectStaffSerializer(
+            Project.objects.filter(
+                id=project_id)[0]).data
         data = {'all_staff': all_staff, 'project_staff': staff['staff']}
+        print(data)
         return Response(data)
 
 
@@ -788,10 +857,14 @@ class ChangeStaff(APIView):
         project = Project.objects.filter(id=project_id)[0]
         user = User.objects.filter(id__in=staff_list)
         for item in user:
-            if user.profile.department_id == department_id:
+            if item.profile.department_id == department_id:
                 project.staff.add(item)
             else:
-                StaffRequest.objects.create(project=project, staff=user, whether=0, department=department_id)
+                StaffRequest.objects.create(
+                    project=project,
+                    staff=item,
+                    whether=0,
+                    department=department_id)
         project.staff.set(user)
         return Response(ProjectInfoSerializer(project).data)
 
@@ -816,9 +889,16 @@ class UserRequest(APIView):
 
     def get(self, request):
         department_id = request.GET.get('department_id')
-        UserRequestSerializer(StaffRequest.objects.filter(department=department_id), many=True)
-        return Response(UserRequestSerializer(StaffRequest.objects.filter(department=department_id), many=True).data,
-                        status=status.HTTP_200_OK)
+        UserRequestSerializer(
+            StaffRequest.objects.filter(
+                department=department_id),
+            many=True)
+        return Response(
+            UserRequestSerializer(
+                StaffRequest.objects.filter(
+                    department=department_id),
+                many=True).data,
+            status=status.HTTP_200_OK)
 
 
 class CloseProject(APIView):
