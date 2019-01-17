@@ -78,16 +78,9 @@ class ProjectInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = (
-            'id',
-            'title',
-            'leader',
-            'content',
-            'begin_time',
-            'end_time',
-            'staff',
-            'out_staff',
-            'status')
+
+        fields = ('id', 'title', 'leader', 'content', 'begin_time', 'end_time', 'staff', 'status')
+
 
     def get_leader(self, obj):
         return UserSerializer(obj.leader).data

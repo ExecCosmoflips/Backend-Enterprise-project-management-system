@@ -5,6 +5,8 @@ from backendproject.models import *
 from django.contrib.auth.models import User
 from django.utils import timezone
 import unittest
+
+
 # Create your tests here.
 
 
@@ -28,19 +30,20 @@ class RegisterAPITest(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.data
         print(response_data)
-        #self.assertEqual(response_data, data['name'])
+        # self.assertEqual(response_data, data['name'])
 
     def tearDown(self):
-        #User.objects.get(id=2).delete()
+        # User.objects.get(id=2).delete()
         print("RegisterAPITest End!")
         print('=============================')
-
 
 
 class IncomeTitleListApiTest(TestCase):
     def setUp(self):
         User.objects.create(id='3', username="wang2", password="123456")
         Department.objects.create(id='2', name="工程部", leader_id='3')
+
+
         Project.objects.create(id='1', content="Test", title="长江工程",
                                begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
                                department_id='2', leader_id='3')
@@ -56,10 +59,119 @@ class IncomeTitleListApiTest(TestCase):
         self.assertEqual(response.status_code, 200)
         # response_data = response.data
         # print(response_data)
-        #self.assertEqual(response_data, data['name'])
+        # self.assertEqual(response_data, data['name'])
 
     def tearDown(self):
         print("IncomeTitleListApiTest End!")
+        print('=============================')
+
+
+class ProjectListApiTest(TestCase):
+
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        UserProfile.objects.create(id='1', access='0', license='0', name='test',
+                                   gender='0', email='test@qq.com', phone='110',
+                                   department_id='2', user_id='3')
+        Project.objects.create(id='1', content="Test", title="长江工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        Project.objects.create(id='2', content="Test2", title="黄河工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        print("ProjectListApiTest Start!")
+
+    def test_project_list_api(self):
+        data = {
+            'department_id': '2'
+        }
+        response = self.client.get('/api/get_project_list', data)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.data
+        print(response_data[0]['department']['name'])
+        self.assertEqual(response_data[0]['department']['name'], '工程部')
+
+    def tearDown(self):
+        print("ProjectListApiTest End!")
+        print('=============================')
+
+
+class ProjectInfoApiTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="wang2", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        UserProfile.objects.create(id='1', access='0', license='0', name='test',
+                                   gender='0', email='test@qq.com', phone='110',
+                                   department_id='2', user_id='3')
+        p = Project.objects.create(id='1', content="Test", title="长江工程",
+                                   begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                                   department_id='2', leader_id='3')
+        p.staff.add(User.objects.get(id=3))
+        Project.objects.create(id='2', content="Test2", title="黄河工程",
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
+                               department_id='2', leader_id='3')
+        print("ProjectInfoApiTest Start!")
+
+    def test_projectinfo_get_api(self):
+        data = {
+            'id': '1'
+        }
+        response = self.client.get('/api/get_project_info', data)
+        response_data = response.data
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['title'], '长江工程')
+
+    def test_projectinfo_post_api(self):
+        data2 = {
+            'leader': '3',
+            'id': '1',
+            'title': 'title test',
+            'content': 'content test',
+            'begin_time': timezone.now(),
+            'end_time': timezone.now() + timezone.timedelta(3)
+        }
+        response2 = self.client.post('/api/get_project_info', data2)
+        response_data2 = response2.data
+        print(response_data2)
+        print("what the frick!")
+
+    def tearDown(self):
+        print("ProjectInfoApiTest End!")
+        print('=============================')
+
+
+class LoginApiTest(TestCase):
+    def setUp(self):
+        User.objects.create(id='3', username="chen", password="123456")
+        Department.objects.create(id='2', name="工程部", leader_id='3')
+        UserProfile.objects.create(id='3', access='0', license='0', name='test',
+                                   gender='0', email='test@qq.com', phone='110',
+                                   department_id='2', user_id='3')
+        print("LoginApiTest Start!")
+
+    def test_login_post_api(self):
+        data = {
+            'userName': 'chen',
+            'password': '123456'
+        }
+        response = self.client.post('/api/login', data)
+        response_data = response.data
+        self.assertEqual(response_data['token'], 'admin')
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_get_api(self):
+        data = {
+            'id': '3'
+        }
+        response = self.client.get('/api/login', data)
+        response_data = response.data
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['access'], 'project_staff')
+
+    def tearDown(self):
+        print("LoginApiTest End!")
+        print('=============================')
 
 
 class UserModelTest(TestCase):
@@ -68,7 +180,7 @@ class UserModelTest(TestCase):
         print("UserModelTest Start!")
 
     def test_user_model(self):
-       # self.assertEqual(DepartmentList(), {[{'department_leader': '1', 'department_name': '人事部'}]})
+        # self.assertEqual(DepartmentList(), {[{'department_leader': '1', 'department_name': '人事部'}]})
         result = User.objects.get(id='2')
         self.assertEqual(result.username, "wang")
 
@@ -99,7 +211,7 @@ class ProjectModelTest(TestCase):
         User.objects.create(id='3', username="wang2", password="123456")
         Department.objects.create(id='2', name="工程部", leader_id='3')
         Project.objects.create(id='1', content="Test", title="长江工程",
-                               begin_time=timezone.now(), end_time=timezone.now()+timezone.timedelta(3),
+                               begin_time=timezone.now(), end_time=timezone.now() + timezone.timedelta(3),
                                department_id='2', leader_id='3')
         print("ProjectModelTest Start!")
 
@@ -259,7 +371,7 @@ class ProfileModelTest(TestCase):
     def setUp(self):
         User.objects.create(id='3', username="wang2", password="123456")
         Department.objects.create(id='2', name="工程部", leader_id='3')
-        UserProfile.objects.create(id='1', access='0', license= '0', name='test',
+        UserProfile.objects.create(id='1', access='0', license='0', name='test',
                                    gender='0', email='test@qq.com', phone='110',
                                    department_id='2', user_id='3')
         print("ProfileModelTest Start!")
@@ -308,9 +420,10 @@ suite.addTest(ProfileModelTest("test_profile_model"))
 suite.addTest(IncomeModelTest("test_income_model"))
 suite.addTest(RegisterAPITest("test_register_api"))
 suite.addTest(IncomeTitleListApiTest("test_income_list"))
+suite.addTest(ProjectListApiTest("test_project_list_api"))
+suite.addTest(ProjectInfoApiTest("test_projectinfo_get_api"))
+suite.addTest(ProjectInfoApiTest("test_projectinfo_post_api"))
+suite.addTest(LoginApiTest("test_login_post_api"))
+
 runner = unittest.TextTestRunner()
 runner.run(suite)
-
-
-
-
