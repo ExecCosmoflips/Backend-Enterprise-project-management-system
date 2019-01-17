@@ -68,9 +68,13 @@ class UserSerializer(serializers.ModelSerializer):
 class ProjectInfoSerializer(serializers.ModelSerializer):
     staff = serializers.SerializerMethodField()
     leader = serializers.SerializerMethodField()
+    out_staff = serializers.SerializerMethodField()
 
     def get_staff(self, obj):
         return UserSerializer(obj.staff.all(), many=True).data
+
+    def get_out_staff(self, obj):
+        return UserSerializer(obj.out_staff.all(), many=True).data
 
     class Meta:
         model = Project
@@ -82,6 +86,7 @@ class ProjectInfoSerializer(serializers.ModelSerializer):
             'begin_time',
             'end_time',
             'staff',
+            'out_staff',
             'status')
 
     def get_leader(self, obj):
@@ -110,6 +115,15 @@ class ProjectStaffSerializer(serializers.ModelSerializer):
 
     def get_staff(self, obj):
         return UserInfoSerializer(obj.staff).data
+
+
+class ProjectOutStaffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ('id', 'staff')
+
+    def get_staff(self, obj):
+        return UserInfoSerializer(obj.out_staff).data
 
 
 class FinancialModelSerializer(serializers.ModelSerializer):
