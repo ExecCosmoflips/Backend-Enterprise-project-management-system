@@ -37,6 +37,7 @@ class Project(models.Model):
     begin_time = models.DateField(default=timezone.now)
     end_time = models.DateField(default=timezone.now)
     staff = models.ManyToManyField(User, related_name='staff_project', null=True)
+    out_staff = models.ManyToManyField(User, related_name='out_staff')
     status = models.IntegerField(default=1)
 
     def __str__(self):

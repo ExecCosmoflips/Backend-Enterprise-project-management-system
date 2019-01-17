@@ -71,6 +71,8 @@ urlpatterns = [
     path('api/addexpend', views.AddExpend.as_view()),
     path('api/get_category_for_add_expend', views.ListAddExpend.as_view()),
     path('api/get_project_list_by_id_for_add_expend', views.ListProjectById.as_view()),
-    path('api/add_project', views.AddProject.as_view())
+    path('api/add_project', views.AddProject.as_view()),
+    path('api/get_out_staff', views.OutStaffList.as_view()),
+    path('api/change_other_staff', views.ChangeOtherStaff.as_view())
 
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
