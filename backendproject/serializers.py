@@ -79,7 +79,7 @@ class ProjectInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
 
-        fields = ('id', 'title', 'leader', 'content', 'begin_time', 'end_time', 'staff', 'status')
+        fields = ('id', 'title', 'leader', 'content', 'begin_time', 'end_time', 'staff', 'status', 'out_staff')
 
 
     def get_leader(self, obj):

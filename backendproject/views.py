@@ -459,12 +459,10 @@ class ListProjectById(APIView):
         print(self.request.GET)
         user = User.objects.filter(id=userid)[0]
         project = user.staff_project.all()
-        print(project)
         project_1 = []
         for item in project:
             project_1.append(
                 {'project_id': item.id, 'project_name': item.title})
-            print(project_1)
         return JsonResponse(project_1, safe=False)
 
 
@@ -486,7 +484,8 @@ class ListAddExpend(APIView):
         project_id = self.request.GET.get('project_id')
         project = Project.objects.filter(id=project_id)[0]
         category = []
-        for item in FinancialModel.objects.filter(project=project, status=0):
+        for item in FinancialModel.objects.filter(project=project, status=2):
+            print()
             category.append(
                 {'category_id': item.id, 'category_name': item.name})
         return JsonResponse(category, safe=False)
@@ -544,6 +543,7 @@ class AddReceivable(APIView):
     # 应收表的插入
     def post(self, request):
         project_id = self.request.POST.get('project_id')
+        print(request.POST.get)
         project = Project.objects.filter(id=project_id)[0]
         category_id = self.request.POST.get('category_id')
         category = FinancialModel.objects.filter(id=category_id)[0]
@@ -606,9 +606,7 @@ class SendEmail(APIView):
     def get(self, request):
         BASE_URL = 'http://localhost:8080/register'
         email = request.GET.get('email')
-        print(email)
         department_id = request.GET.get('department_id')
-        print(department_id)
         if email and department_id:
             user = User.objects.create_user(username=email)
             UserProfile.objects.create(
@@ -689,10 +687,13 @@ class UseCategoryGetReceivableForIncome(APIView):
 
     def get(self, request):
         receivable_category = self.request.GET.get('receivable_category')
+        print(receivable_category)
         fm = FinancialModel.objects.filter(name=receivable_category)[0]
+        print(fm)
         receivable = []
-        for item in Receivable.objects.filter(category=fm, advance_state='0', income_state='0'):
+        for item in Receivable.objects.filter(category=fm, income_state='0'):
             receivable.append({'receivable_id': item.id, 'receivable_title': item.title})
+        print(receivable)
         return JsonResponse(receivable, safe=False)
 
 
