@@ -816,7 +816,7 @@ class AllStaffs(APIView):
         project_id = request.GET.get('project_id')
         department_id = Project.objects.get(id=project_id).department_id
         all_staff = []
-        for item in UserProfile.objects.filter(department_id=department_id):
+        for item in UserProfile.objects.filter(department_id=department_id, access=0):
             name = "未命名"
             if item.name:
                 name = item.name
@@ -837,7 +837,7 @@ class OutStaffList(APIView):
         project = Project.objects.filter(id=project_id)[0]
         department_id = project.department_id
         all_staff = []
-        for item in UserProfile.objects.filter(~Q(department_id=department_id)):
+        for item in UserProfile.objects.filter(~Q(department_id=department_id), access=0):
             name = "未命名"
             if item.name:
                 name = item.name
