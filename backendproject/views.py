@@ -858,9 +858,9 @@ class ChangeStaff(APIView):
         receive = request.data
         project_id = receive['project_id']
         direction = receive['direction']
-        moveKeys = receive['moveKeys'].split(',')
+        move_keys = receive['moveKeys'].split(',')
         project = Project.objects.filter(id=project_id)[0]
-        user = User.objects.filter(id__in=moveKeys)
+        user = User.objects.filter(id__in=move_keys)
         if direction == 'left':
             for item in user:
                 project.staff.remove(item)
@@ -875,9 +875,9 @@ class ChangeOtherStaff(APIView):
         receive = request.data
         project_id = receive['project_id']
         direction = receive['direction']
-        moveKeys = receive['moveKeys'].split(',')
+        move_keys = receive['moveKeys'].split(',')
         project = Project.objects.filter(id=project_id)[0]
-        user = User.objects.filter(id__in=moveKeys)
+        user = User.objects.filter(id__in=move_keys)
         if direction == 'left':
             for item in user:
                 project.out_staff.remove(item)
