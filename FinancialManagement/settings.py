@@ -81,11 +81,11 @@ WSGI_APPLICATION = 'FinancialManagement.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'financial',
+        'NAME': 'test',
         'USER': 'root',
-        'PASSWORD': 'wf851098',
-        'HOST': '',
-        'PORT': '3307',
+        'PASSWORD': 'hyh282038',
+        'HOST': '39.108.77.176',
+        'PORT': '3306',
 
         'OPTIONS': {
             'autocommit': True,
