@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -27,11 +26,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'backendproject.apps.BackendprojectConfig',
+    'rest_framework_swagger',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,7 +52,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
 ROOT_URLCONF = 'FinancialManagement.urls'
 
 TEMPLATES = [
@@ -74,25 +72,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'FinancialManagement.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
+        'NAME': 'financial',
         'USER': 'root',
-        'PASSWORD': 'hyh282038',
-        'HOST': '39.108.77.176',
-        'PORT': '3306',
+        'PASSWORD': 'wf851098',
+        'HOST': '',
+        'PORT': '3307',
 
         'OPTIONS': {
             'autocommit': True,
         }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -112,7 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -125,7 +120,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -153,19 +147,18 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
 )
 
-
 # 配置邮箱发邮件的相关功能
 
-#这一项是固定的
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# 这一项是固定的
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_SSL = True
 # smtp服务的邮箱服务器
 EMAIL_HOST = 'smtp.qq.com'
 # smtp服务的端口
 EMAIL_PORT = 465
-#发送邮件的邮箱
+# 发送邮件的邮箱
 EMAIL_HOST_USER = '1452372625@qq.com'
-#在邮箱中设置的客户端授权密码
+# 在邮箱中设置的客户端授权密码
 EMAIL_HOST_PASSWORD = 'ucaqyzcpjuibjaff'
-#收件人看到的发件人 <此处要和发送邮件的邮箱相同>
+# 收件人看到的发件人 <此处要和发送邮件的邮箱相同>
 EMAIL_FROM = 'python<1452372625@qq.com>'

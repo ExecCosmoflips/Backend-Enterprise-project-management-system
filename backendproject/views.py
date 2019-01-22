@@ -105,7 +105,7 @@ class PersonnelInfo(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_id = self.request.GET.get('project_id')
-        self.queryset = Project.objects.filter(id=project_id)[0].personnel
+        self.queryset = Project.objects.filter(id=project_id)[0].staff
         return self.queryset
 
 
@@ -190,11 +190,304 @@ class GetProjectBarData(APIView):
         expend_list = []
         expend = project.project_confirm.filter(
             time__range=(start_time, end_time))
+        print(expend)
         for item in expend:
             expend_list.append({
                 'date': str(item.time)[0:7],
                 'number': item.number
             })
+        expend_list = [
+            {
+                'date': '2019-01',
+                'number': 2000
+            },
+            {
+                'date': '2019-02',
+                'number': 2500
+            },
+            {
+                'date': '2019-03',
+                'number': 4000
+            },
+            {
+                'date': '2019-04',
+                'number': 3700
+            },
+            {
+                'date': '2019-05',
+                'number': 5000
+            },
+            {
+                'date': '2019-06',
+                'number': 4000
+            },
+            {
+                'date': '2019-07',
+                'number': 2000
+            },
+            {
+                'date': '2019-08',
+                'number': 7000
+            },
+            {
+                'date': '2019-09',
+                'number': 5679
+            },
+            {
+                'date': '2019-10',
+                'number': 3786
+            },
+            {
+                'date': '2019-11',
+                'number': 8222
+            },
+            {
+                'date': '2019-12',
+                'number': 6431
+            },
+            {
+                'date': '2020-01',
+                'number': 4039
+            },
+            {
+                'date': '2020-02',
+                'number': 4396
+            },
+            {
+                'date': '2020-03',
+                'number': 1300
+            },
+            {
+                'date': '2020-04',
+                'number': 5832
+            },
+            {
+                'date': '2020-05',
+                'number': 9000
+            },
+            {
+                'date': '2020-06',
+                'number': 7536
+            },
+            {
+                'date': '2020-07',
+                'number': 6795
+            },
+            {
+                'date': '2020-08',
+                'number': 5785
+            },
+            {
+                'date': '2020-09',
+                'number': 12000
+            },
+            {
+                'date': '2020-10',
+                'number': 4544
+            },
+            {
+                'date': '2020-11',
+                'number': 1000
+            },
+            {
+                'date': '2020-12',
+                'number': 3000
+            },
+            {
+                'date': '2021-01',
+                'number': 4039
+            },
+            {
+                'date': '2021-02',
+                'number': 4396
+            },
+            {
+                'date': '2021-03',
+                'number': 1300
+            },
+            {
+                'date': '2021-04',
+                'number': 5832
+            },
+            {
+                'date': '2021-05',
+                'number': 9000
+            },
+            {
+                'date': '2021-06',
+                'number': 7536
+            },
+            {
+                'date': '2021-07',
+                'number': 6795
+            },
+            {
+                'date': '2021-08',
+                'number': 5785
+            },
+            {
+                'date': '2021-09',
+                'number': 12000
+            },
+            {
+                'date': '2021-10',
+                'number': 4544
+            },
+            {
+                'date': '2021-11',
+                'number': 1000
+            },
+            {
+                'date': '2021-12',
+                'number': 3000
+            }
+        ]
+        income_list = [
+            {
+                'date': '2019-01',
+                'number': 1500
+            },
+            {
+                'date': '2019-02',
+                'number': 3000
+            },
+            {
+                'date': '2019-03',
+                'number': 6000
+            },
+            {
+                'date': '2019-04',
+                'number': 2000
+            },
+            {
+                'date': '2019-05',
+                'number': 3567
+            },
+            {
+                'date': '2019-06',
+                'number': 5785
+            },
+            {
+                'date': '2019-07',
+                'number': 1244
+            },
+            {
+                'date': '2019-08',
+                'number': 4396
+            },
+            {
+                'date': '2019-09',
+                'number': 1300
+            },
+            {
+                'date': '2019-10',
+                'number': 3100
+            },
+            {
+                'date': '2019-11',
+                'number': 5000
+            },
+            {
+                'date': '2019-12',
+                'number': 3700
+            },
+            {
+                'date': '2020-01',
+                'number': 1700
+            },
+            {
+                'date': '2020-02',
+                'number': 4000
+            },
+            {
+                'date': '2020-03',
+                'number': 3000
+            },
+            {
+                'date': '2020-04',
+                'number': 4068
+            },
+            {
+                'date': '2020-05',
+                'number': 6000
+            },
+            {
+                'date': '2020-06',
+                'number': 7536
+            },
+            {
+                'date': '2020-07',
+                'number': 8000
+            },
+            {
+                'date': '2020-08',
+                'number': 200
+            },
+            {
+                'date': '2020-09',
+                'number': 1399
+            },
+            {
+                'date': '2020-10',
+                'number': 8000
+            },
+            {
+                'date': '2020-11',
+                'number': 4053
+            },
+            {
+                'date': '2020-12',
+                'number': 3000
+            },
+            {
+                'date': '2021-01',
+                'number': 2667
+            },
+            {
+                'date': '2021-02',
+                'number': 5477
+            },
+            {
+                'date': '2021-03',
+                'number': 8000
+            },
+            {
+                'date': '2021-04',
+                'number': 2000
+            },
+            {
+                'date': '2021-05',
+                'number': 4000
+            },
+            {
+                'date': '2021-06',
+                'number': 5487
+            },
+            {
+                'date': '2021-07',
+                'number': 4568
+            },
+            {
+                'date': '2021-08',
+                'number': 3865
+            },
+            {
+                'date': '2021-09',
+                'number': 6000
+            },
+            {
+                'date': '2021-10',
+                'number': 6535
+            },
+            {
+                'date': '2021-11',
+                'number': 4000
+            },
+            {
+                'date': '2021-12',
+                'number': 2000
+            }
+        ]
         data = {
             'expendList': expend_list,
             'incomeList': income_list
@@ -221,6 +514,72 @@ class GetProjectPieData(APIView):
                 'category').annotate(value=Sum('confirm_num'))
             expend = project.project_confirm.values(
                 'category').annotate(value=Sum('number'))
+        # print(income)
+        #<QuerySet [{'category': '1', 'value': 7000.0}, {'category': '收入类别2', 'value': 6000.0}]>
+        income = [
+            {
+                'category': '类别1',
+                'value': 7000
+            },
+            {
+                'category': '类别2',
+                'value': 6000
+            },
+            {
+                'category': '类别3',
+                'value': 4000
+            },
+            {
+                'category': '类别4',
+                'value': 5500
+            },
+            {
+                'category': '类别5',
+                'value': 3500
+            },
+            {
+                'category': '类别6',
+                'value': 4000
+            },
+            {
+                'category': '类别7',
+                'value': 2000
+            },
+            {
+                'category': '类别8',
+                'value': 5789
+            },
+            {
+                'category': '类别9',
+                'value': 5000
+            },
+            {
+                'category': '类别10',
+                'value': 2000
+            },
+            {
+                'category': '类别11',
+                'value': 3000
+            },
+        ]
+        expend = [
+            {
+                'category': '类别1',
+                'value': 5893
+            },
+            {
+                'category': '类别2',
+                'value': 2585
+            },
+            {
+                'category': '类别3',
+                'value': 4000
+            },
+            {
+                'category': '类别4',
+                'value': 4674
+            }
+        ]
         return Response({'income': income, 'expend': expend},
                         status=status.HTTP_200_OK)
 
@@ -457,7 +816,7 @@ class ListProjectById(APIView):
     def get(self, request):
         userid = self.request.GET.get('user_id')
         print(self.request.GET)
-        user = User.objects.filter(id=userid)[0]
+        user = User.objects.filter(id=1)[0]
         project = user.staff_project.all()
         project_1 = []
         for item in project:
@@ -817,7 +1176,7 @@ class AllStaffs(APIView):
         project_id = request.GET.get('project_id')
         department_id = Project.objects.get(id=project_id).department_id
         all_staff = []
-        for item in UserProfile.objects.filter(department_id=department_id, access=0):
+        for item in UserProfile.objects.filter(department_id=department_id):
             name = "未命名"
             if item.name:
                 name = item.name
